@@ -1,0 +1,74 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true" scanPeriod="120 seconds">
+    <timestamp key="ymd" datePattern="yyyy-MM-dd"/>
+    <springProperty scope="context" name="LOG_PATH" source="logging.file.path"/>
+    <springProperty scope="context" name="LOGSTASH_DEST" source="logstash.destination"/>
+    <conversionRule conversionWord="nanotime" converterClass="com.boncfc.ide.server.worker.log.NanoTimeConvert"/>
+
+    <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <encoder>
+            <pattern>
+                %highlight(%-5level) %d{yyyy-MM-dd HH:mm:ss.SSS} %boldYellow([%thread]) %boldGreen(%logger{96}:[%line]) - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="WORKERLOGFILE" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${LOG_PATH}/ide-worker.log</file>
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+        <filter class="com.boncfc.ide.server.worker.log.WorkerLogFilter"/>
+        <rollingPolicy class="ch.qos.logback.core.rolling.SizeAndTimeBasedRollingPolicy">
+            <FileNamePattern>${LOG_PATH}/${ymd}/ide-worker.%d{yyyy-MM-dd_HH}.%i.log</FileNamePattern>
+            <maxHistory>360</maxHistory>
+            <maxFileSize>100MB</maxFileSize>
+        </rollingPolicy>
+        <encoder>
+            <pattern>
+                %-5level %d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %logger{96}:[%line] - %msg%n
+            </pattern>
+        </encoder>
+    </appender>
+
+    <appender name="TASKLOGSTASH" class="net.logstash.logback.appender.LogstashTcpSocketAppender">
+        <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
+            <level>INFO</level>
+        </filter>
+
+        <filter class="com.boncfc.ide.server.worker.log.TaskLogFilter"/>
+        <destination>${LOGSTASH_DEST}</destination>
+        <connectionStrategy>
+            <roundRobin>
+                <connectionTTL>5 minutes</connectionTTL>
+            </roundRobin>
+        </connectionStrategy>
+        <encoder class="net.logstash.logback.encoder.LoggingEventCompositeJsonEncoder">
+            <providers>
+                <pattern>
+                    <!--<omitEmptyFields>true</omitEmptyFields>-->
+                    <pattern>
+                        {
+                        "appname": "ide-worker",
+                        "datatime": "%d{yyyy-MM-dd HH:mm:ss.SSS}",
+                        "nanotime": "#asLong{%nanotime}",
+                        "jobinst_id": "%mdc{jobInst.id}",
+                        "level": "%level",
+                        "thread": "%thread",
+                        "class": "%logger",
+                        "message": "%message",
+                        "stack_trace": "%exception"
+                        }
+                    </pattern>
+                </pattern>
+            </providers>
+        </encoder>
+    </appender>
+
+
+    <root level="INFO">
+        <appender-ref ref="STDOUT"/>
+        <appender-ref ref="WORKERLOGFILE"/>
+        <appender-ref ref="TASKLOGSTASH"/>
+    </root>
+</configuration>
