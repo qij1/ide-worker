@@ -21,6 +21,7 @@ import com.boncfc.ide.plugin.task.api.TaskCallBack;
 import com.boncfc.ide.plugin.task.api.TaskException;
 import com.boncfc.ide.plugin.task.api.TaskExecutionContext;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
+import com.boncfc.ide.server.worker.config.YarnConfig;
 import com.boncfc.ide.server.worker.mapper.WorkerMapper;
 import com.boncfc.ide.server.worker.registry.RegistryClient;
 import com.boncfc.ide.server.worker.registry.WorkerRegistryClient;
@@ -30,11 +31,13 @@ public class DefaultWorkerTaskExecutor extends WorkerTaskExecutor {
 
     public DefaultWorkerTaskExecutor(@NonNull TaskExecutionContext taskExecutionContext,
                                      @NonNull WorkerConfig workerConfig,
+                                     @NonNull YarnConfig yarnConfig,
                                      @NonNull WorkerRegistryClient workerRegistryClient,
                                      @NonNull WorkerMapper workerMapper,
                                      @NonNull RegistryClient registryClient) {
         super(taskExecutionContext,
                 workerConfig,
+                yarnConfig,
                 workerRegistryClient,
                 workerMapper,
                 registryClient);

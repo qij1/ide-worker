@@ -55,7 +55,7 @@ public class HiveDataSourceProcessor extends AbstractDataSourceProcessor {
         checkDatabasePatter(baseConnectionParam.getDatabase());
         if (baseConnectionParam.getUserName() == null || baseConnectionParam.getPassword() == null ||
                 baseConnectionParam.getDriverClassName() == null || baseConnectionParam.getDriverLocation() == null) {
-            throw new IllegalArgumentException("mysql datasource param is not valid");
+            throw new IllegalArgumentException("hive datasource param is not valid");
         }
     }
 

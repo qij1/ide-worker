@@ -20,13 +20,15 @@ package com.boncfc.ide.server.worker.runner;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
 
 /**
  * Used to store all running and waiting {@link WorkerTaskExecutor}. If the task has been finished, it will be removed from the map.
  */
 public class WorkerTaskExecutorHolder {
 
-    private static final Map<Integer, WorkerTaskExecutor> workerTaskExecutorMap = new HashMap<>();
+    private static final Map<Integer, WorkerTaskExecutor> workerTaskExecutorMap = new ConcurrentHashMap<>();
 
     public static void put(WorkerTaskExecutor workerTaskExecutor) {
         int jobInstId = workerTaskExecutor.getTaskExecutionContext().getJobInstance().getJiId();

@@ -2,18 +2,13 @@ package com.boncfc.ide.server.worker;
 
 import com.boncfc.ide.plugin.task.api.TaskPluginManager;
 import com.boncfc.ide.plugin.task.api.datasource.DataSourceProcessorProvider;
-import com.boncfc.ide.plugin.task.api.utils.JSONUtils;
 import com.boncfc.ide.server.worker.common.IStoppable;
 import com.boncfc.ide.server.worker.common.lifecycle.ServerLifeCycleManager;
-import com.boncfc.ide.server.worker.config.WorkerConfig;
 import com.boncfc.ide.server.worker.constants.Constants;
-import com.boncfc.ide.server.worker.mapper.WorkerMapper;
 import com.boncfc.ide.server.worker.registry.RegistryClient;
 import com.boncfc.ide.server.worker.registry.WorkerRegistryClient;
 import com.boncfc.ide.server.worker.thread.TaskThread;
 import com.boncfc.ide.server.worker.utils.ThreadUtils;
-import com.fasterxml.jackson.databind.node.ArrayNode;
-import com.fasterxml.jackson.databind.node.ObjectNode;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -21,10 +16,6 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PostConstruct;
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.sql.*;
-import java.util.Properties;
 import java.util.concurrent.ExecutorService;
 
 
@@ -54,7 +45,6 @@ public class WorkerServer implements IStoppable {
 
     @PostConstruct
     public void run() {
-        System.out.println("111");
         TaskPluginManager.loadPlugin();
         DataSourceProcessorProvider.initialize();
         this.workerRegistryClient.setRegistryStoppable(this);

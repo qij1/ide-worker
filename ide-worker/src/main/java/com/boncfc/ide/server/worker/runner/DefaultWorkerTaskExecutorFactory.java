@@ -19,6 +19,7 @@ package com.boncfc.ide.server.worker.runner;
 
 import com.boncfc.ide.plugin.task.api.TaskExecutionContext;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
+import com.boncfc.ide.server.worker.config.YarnConfig;
 import com.boncfc.ide.server.worker.mapper.WorkerMapper;
 import com.boncfc.ide.server.worker.registry.RegistryClient;
 import com.boncfc.ide.server.worker.registry.WorkerRegistryClient;
@@ -32,16 +33,20 @@ public class DefaultWorkerTaskExecutorFactory
     private final @NonNull TaskExecutionContext taskExecutionContext;
     private final @NonNull WorkerConfig workerConfig;
 
+    private final @NonNull YarnConfig yarnConfig;
+
     private final @NonNull RegistryClient registryClient;
 
     private final @NonNull WorkerMapper workerMapper;
     public DefaultWorkerTaskExecutorFactory(@NonNull TaskExecutionContext taskExecutionContext,
                                             @NonNull WorkerConfig workerConfig,
+                                            @NonNull YarnConfig yarnConfig,
                                             @NonNull WorkerRegistryClient workerRegistryClient,
                                             @NonNull RegistryClient registryClient,
                                             @NonNull WorkerMapper workerMapper) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
+        this.yarnConfig = yarnConfig;
         this.workerRegistryClient = workerRegistryClient;
         this.workerMapper = workerMapper;
         this.registryClient = registryClient;
@@ -54,6 +59,7 @@ public class DefaultWorkerTaskExecutorFactory
         return new DefaultWorkerTaskExecutor(
                 taskExecutionContext,
                 workerConfig,
+                yarnConfig,
                 workerRegistryClient,
                 workerMapper,
                 registryClient);

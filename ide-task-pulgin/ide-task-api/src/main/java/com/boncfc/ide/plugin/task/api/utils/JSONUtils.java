@@ -61,6 +61,7 @@ public final class JSONUtils {
             .configure(READ_UNKNOWN_ENUM_VALUES_AS_NULL, true)
             .configure(REQUIRE_SETTERS_FOR_GETTERS, true)
             .configure(FAIL_ON_EMPTY_BEANS, false)
+            .configure(JsonParser.Feature.ALLOW_UNQUOTED_CONTROL_CHARS, true)
             .addModule(new SimpleModule()
                     .addSerializer(LocalDateTime.class, new LocalDateTimeSerializer())
                     .addDeserializer(LocalDateTime.class, new LocalDateTimeDeserializer()))

@@ -3,6 +3,7 @@ package com.boncfc.ide.server.worker.thread;
 
 import com.boncfc.ide.plugin.task.api.TaskExecutionContext;
 import com.boncfc.ide.plugin.task.api.model.*;
+import com.boncfc.ide.plugin.task.api.utils.JSONUtils;
 import com.boncfc.ide.plugin.task.conditionalbranch.ConditionalBranchJobConf;
 import com.boncfc.ide.plugin.task.dataquality.DataQualityJobConf;
 import com.boncfc.ide.plugin.task.datax.DataxJobConf;
@@ -21,7 +22,6 @@ import com.boncfc.ide.server.worker.registry.enums.RegistryNodeType;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutor;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorFactoryBuilder;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorThreadPool;
-import com.boncfc.ide.server.worker.utils.JSONUtils;
 import com.boncfc.ide.server.worker.utils.ThreadUtils;
 import com.boncfc.ide.server.worker.utils.TimeParser;
 import lombok.extern.slf4j.Slf4j;
@@ -174,8 +174,9 @@ public class TaskThread implements Runnable {
                 "                 {\"dsName\":\"test2\",\"dsId\": \"3553264497476608\", \"tableName\": \"test\",  \"preSql\":\" \",\"postSql\":\"\",\"batchSize\":\"512\"}]\n" +
                 "    }";
         String jsonSql = "{\n" +
-                "   \"dsId\":\"test1\",\n" +
-                "   \"querySql\": \"select 1\" " +
+                " \"dsId\": 1,\n" +
+                " \"querySql\":\"insert into TEST_TABLE(id, name, sex) VALUES (1, 'aaaaaa', '0');\\n" +
+                "                select name from TEST_TABLE where sex = 0;\"\n" +
                 "}";
         String jsonConditional = "";
         String jsonCheck = "{" +
@@ -204,7 +205,7 @@ public class TaskThread implements Runnable {
                 "   \"stopRequestMethod\":\"GET\",\n" +
                 "   \"stopRequestHeaders\":[{\"content-type\":\"\"}]\n" +
                 "}";
-        DataxJobConf jsonObject = JSONUtils.parseObject(jsonDatax, DataxJobConf.class);
+        SqlJobConf jsonObject = JSONUtils.parseObject(jsonSql, SqlJobConf.class);
         System.out.println(jsonObject);
     }
 

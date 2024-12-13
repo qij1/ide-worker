@@ -19,6 +19,7 @@ package com.boncfc.ide.server.worker.runner;
 
 import com.boncfc.ide.plugin.task.api.TaskExecutionContext;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
+import com.boncfc.ide.server.worker.config.YarnConfig;
 import com.boncfc.ide.server.worker.mapper.WorkerMapper;
 import com.boncfc.ide.server.worker.registry.RegistryClient;
 import com.boncfc.ide.server.worker.registry.WorkerRegistryClient;
@@ -40,9 +41,13 @@ public class WorkerTaskExecutorFactoryBuilder {
     @Autowired
     private RegistryClient registryClient;
 
+    @Autowired
+    private YarnConfig yarnConfig;
+
     public WorkerTaskExecutorFactory<? extends WorkerTaskExecutor> createWorkerTaskExecutorFactory(TaskExecutionContext taskExecutionContext) {
         return new DefaultWorkerTaskExecutorFactory(taskExecutionContext,
                 workerConfig,
+                yarnConfig,
                 workerRegistryClient,
                 registryClient,
                 workerMapper);

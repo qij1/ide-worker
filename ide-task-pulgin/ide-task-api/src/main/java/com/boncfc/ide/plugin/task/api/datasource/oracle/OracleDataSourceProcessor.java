@@ -130,4 +130,15 @@ public class OracleDataSourceProcessor extends AbstractDataSourceProcessor {
         return SQLParserUtils.split(cleanSQL, com.alibaba.druid.DbType.oracle);
     }
 
+    public static void main(String[] args) {
+        String dsConf = "{\n" +
+                "\t\"jdbcUrl\":\"jdbc:oracle:thin:@localhost:1521:ORCL\",\n" +
+                "\t\"driverId\":\"1\",\n" +
+                "\t\"userName\":\"ide\",\n" +
+                "\t\"password\":\"ide\"\n" +
+                "}";
+        OracleConnectionParam  oracleConnectionParam = JSONUtils.parseObject(dsConf, OracleConnectionParam.class);
+        System.out.println(oracleConnectionParam);
+    }
+
 }

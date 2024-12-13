@@ -18,25 +18,25 @@
 package com.boncfc.ide.server.worker.runner;
 
 import com.boncfc.ide.plugin.task.api.*;
-import com.boncfc.ide.plugin.task.api.model.JobInstanceExtStatus;
-import com.boncfc.ide.plugin.task.api.model.JobInstance;
-import com.boncfc.ide.plugin.task.api.model.TaskExecutionStatus;
+import com.boncfc.ide.plugin.task.api.model.*;
+import com.boncfc.ide.plugin.task.api.utils.JSONUtils;
 import com.boncfc.ide.server.worker.common.log.TaskInstanceLogHeader;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
+import com.boncfc.ide.server.worker.config.YarnConfig;
 import com.boncfc.ide.server.worker.mapper.WorkerMapper;
 import com.boncfc.ide.server.worker.registry.RegistryClient;
 import com.boncfc.ide.server.worker.registry.WorkerRegistryClient;
+import com.boncfc.ide.server.worker.registry.enums.RegistryNodeType;
 import com.boncfc.ide.server.worker.utils.*;
 import lombok.NonNull;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import javax.annotation.Nullable;
-import java.util.Date;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 
-import static com.boncfc.ide.plugin.task.api.constants.Constants.YES;
+import static com.boncfc.ide.plugin.task.api.constants.Constants.*;
 import static com.boncfc.ide.plugin.task.api.model.JobInstanceExtStatus.fail_normal;
 import static com.boncfc.ide.plugin.task.api.model.JobInstanceStatus.fail;
 import static com.boncfc.ide.plugin.task.api.model.JobParamType.IN;
@@ -49,23 +49,32 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
     protected final TaskExecutionContext taskExecutionContext;
     protected final WorkerConfig workerConfig;
+    protected final YarnConfig yarnConfig;
     protected final WorkerRegistryClient workerRegistryClient;
     protected final WorkerMapper workerMapper;
     protected final RegistryClient registryClient;
 
     protected @Nullable AbstractTask task;
 
+    protected final String jobInstancePath;
+
     protected WorkerTaskExecutor(
             @NonNull TaskExecutionContext taskExecutionContext,
             @NonNull WorkerConfig workerConfig,
+            @NonNull YarnConfig yarnConfig,
             @NonNull WorkerRegistryClient workerRegistryClient,
             @NonNull WorkerMapper workerMapper,
             @NonNull RegistryClient registryClient) {
         this.taskExecutionContext = taskExecutionContext;
         this.workerConfig = workerConfig;
+        this.yarnConfig = yarnConfig;
         this.workerRegistryClient = workerRegistryClient;
         this.workerMapper = workerMapper;
         this.registryClient = registryClient;
+        JobInstance jobInstance = taskExecutionContext.getJobInstance();
+        this.jobInstancePath = String.join("/", RegistryNodeType.JOB_INSTANCE_BASE.getRegistryPath(),
+                String.valueOf(jobInstance.getJfiId()), String.valueOf(jobInstance.getJiId()));
+
     }
 
     protected abstract void executeTask(TaskCallBack taskCallBack);
@@ -75,8 +84,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
             throw new TaskException("The current task instance is null");
         }
 //        sendAlertIfNeeded();
-
-        sendTaskResult();
+        processTaskResult();
         WorkerTaskExecutorHolder.remove(taskExecutionContext.getJobInstance().getJiId());
         log.info("Remove the current task execute context from worker cache");
 
@@ -88,10 +96,9 @@ public abstract class WorkerTaskExecutor implements Runnable {
         }
         WorkerTaskExecutorHolder.remove(taskExecutionContext.getJobInstance().getJiId());
         taskExecutionContext.getJobInstance().setFinishTime(DateUtils.getCurrentDate());
-        taskExecutionContext.getJobInstance().setStatus(fail.name());
-        taskExecutionContext.getJobInstance().setExtendedStatus(fail_normal.name());
-
+        updateJobInstanceStatus(JobInstanceStatus.fail, fail_normal);
     }
+
 
     protected boolean cancelTask() {
         // cancel the task
@@ -100,7 +107,10 @@ public abstract class WorkerTaskExecutor implements Runnable {
         }
         try {
             task.cancel();
-            ProcessUtils.cancelApplication(taskExecutionContext);
+            // 如果有提交上 Yarn，需要补充杀死一下
+            if(taskExecutionContext.getAppId() != null && !taskExecutionContext.getAppId().isEmpty()) {
+                ProcessUtils.stopYarnJob(yarnConfig.getApplicationState(), taskExecutionContext.getAppId());
+            }
             return true;
         } catch (Exception e) {
             log.error("Cancel task failed, this will not affect the taskInstance status, but you need to check manual",
@@ -111,6 +121,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
     @Override
     public void run() {
+        Thread.currentThread().setName("TaskLog-"+taskExecutionContext.getJobInstance().getJiId());
         try {
             JobInstance jobInstance = taskExecutionContext.getJobInstance();
             LogUtils.setJobInstanceIDMDC(jobInstance.getJiId());
@@ -118,25 +129,33 @@ public abstract class WorkerTaskExecutor implements Runnable {
             initializeTask();
             TaskInstanceLogHeader.printLoadTaskInstancePluginHeader();
             beforeExecute();
-
             TaskCallBack taskCallBack = TaskCallbackImpl.builder()
                     .taskExecutionContext(taskExecutionContext)
                     .build();
-
             TaskInstanceLogHeader.printExecuteTaskHeader();
+            updateJobInstanceStatus(JobInstanceStatus.inp, JobInstanceExtStatus.inp_running);
             executeTask(taskCallBack);
-
             TaskInstanceLogHeader.printFinalizeTaskHeader();
             afterExecute();
         } catch (Throwable ex) {
             log.error("Task execute failed, due to meet an exception", ex);
             afterThrowing(ex);
-            closeLogAppender();
         } finally {
             LogUtils.removeJobInstanceIdMDC();
         }
     }
 
+    public void updateJobInstanceStatus(JobInstanceStatus status, JobInstanceExtStatus jobInstanceExtStatus) {
+        Map<String, String> jobInstanceStatus = new HashMap<>();
+        jobInstanceStatus.put("jobInstanceStatus", status.name());
+        jobInstanceStatus.put("jobInstanceExtStatus", jobInstanceExtStatus.name());
+        registryClient.persistEphemeral(this.jobInstancePath, JSONUtils.toPrettyJsonString(jobInstanceStatus));
+
+        this.taskExecutionContext.getJobInstance().setExtendedStatus(jobInstanceExtStatus.name());
+        this.taskExecutionContext.getJobInstance().setStatus(status.name());
+        log.info("Set job status: {} , ext status: {}", status.name(), jobInstanceExtStatus.name());
+        workerMapper.updateJobInstance(taskExecutionContext.getJobInstance());
+    }
 
     protected void initializeTask() {
         log.info("Begin to initialize task");
@@ -148,12 +167,9 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
 
     protected void beforeExecute() {
-        taskExecutionContext.getJobInstance().setExtendedStatus(JobInstanceExtStatus.inp_torun.name());
-        log.info("Set job ext status: {}", JobInstanceExtStatus.inp_torun.name());
-        workerMapper.updateJobInstance(taskExecutionContext.getJobInstance());
-
+        updateJobInstanceStatus(JobInstanceStatus.inp, JobInstanceExtStatus.inp_torun);
         log.info("add jobinstance params,jiId {}", taskExecutionContext.getJobInstance().getJiId());
-
+        workerMapper.deleteJobInstanceParams(String.valueOf(taskExecutionContext.getJobInstance().getJiId()));
         workerMapper.addJobInstanceParams(taskExecutionContext.getJobInstanceParamsList().stream()
                 .filter(jobInstanceParams -> IN.name().equals(jobInstanceParams.getJobParamType()) ||
                                              !RUNTIME.name().equals(jobInstanceParams.getParamType()))
@@ -190,18 +206,46 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
     }
 
-    protected void sendTaskResult() {
+    protected void processTaskResult() {
+        // 状态更新
+        taskExecutionContext.getJobInstance().setFinishTime(DateUtils.getCurrentDate());
+        taskExecutionContext.getJobInstance().setUpdateTime(DateUtils.getCurrentDate());
         TaskExecutionStatus taskExecutionStatus = task.getExitStatus();
-        JobInstance jobInstance = taskExecutionContext.getJobInstance();
-        jobInstance.setFinishTime(DateUtils.getCurrentDate());
 
-//        taskExecutionContext.setProcessId(task.getProcessId());
-//        taskExecutionContext.setAppIds(task.getAppIds());
-//        taskExecutionContext.setVarPool(JSONUtils.toJsonString(task.getParameters().getVarPool()));
-//        taskExecutionContext.setEndTime(System.currentTimeMillis());
-//
-//        log.info("Send task execute status: {} to master : {}", taskExecutionContext.getCurrentExecutionStatus().name(),
-//                taskExecutionContext.getHost());
+        if(taskExecutionStatus.isSuccess()) {
+            updateJobInstanceStatus(JobInstanceStatus.success, JobInstanceExtStatus.success_normal);
+        } else if (taskExecutionStatus.isFailure()) {
+            updateJobInstanceStatus(JobInstanceStatus.fail, JobInstanceExtStatus.fail_normal);
+        } else if (taskExecutionStatus.isKill()) {
+            updateJobInstanceStatus(JobInstanceStatus.fail, JobInstanceExtStatus.fail_killed);
+        }
+
+        List<JobInstanceIds> jobInstanceIdsList = new LinkedList<>();
+        if(taskExecutionContext.getAppId() != null && !taskExecutionContext.getAppId().isEmpty()) {
+            JobInstanceIds jobInstanceIds = JobInstanceIds.builder()
+                    .jiId(taskExecutionContext.getJobInstance().getJiId())
+                    .idType(APPLICATION_ID)
+                    .idValue(taskExecutionContext.getAppId())
+                    .build();
+            jobInstanceIdsList.add(jobInstanceIds);
+        }
+
+        if(0 != taskExecutionContext.getProcessId()) {
+            JobInstanceIds jobInstanceIds = JobInstanceIds.builder()
+                    .jiId(taskExecutionContext.getJobInstance().getJiId())
+                    .idType(PID)
+                    .idValue(String.valueOf(taskExecutionContext.getProcessId()))
+                    .build();
+            jobInstanceIdsList.add(jobInstanceIds);
+        }
+        if(!jobInstanceIdsList.isEmpty()) workerMapper.addJobInstanceIds(jobInstanceIdsList);
+
+        // 输出参数
+        List<JobInstanceParams> jobInstanceParams = this.taskExecutionContext.getJobInstanceParamsList().stream()
+                .filter(jp -> OUT.name().equals(jp.getJobParamType()) && RUNTIME.name().equals(jp.getParamType()))
+                .sorted(Comparator.comparing(JobInstanceParams::getSortIndex))
+                .collect(Collectors.toList());
+        if(!jobInstanceIdsList.isEmpty()) workerMapper.addJobInstanceParams(jobInstanceParams);
     }
 
     protected void closeLogAppender() {

@@ -1,5 +1,5 @@
 package com.boncfc.ide.plugin.task.api.model;
 
-public enum JobInstanceStatus {
+public enum  JobInstanceStatus {
     wait,pause,inp,success,fail
 }

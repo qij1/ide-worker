@@ -21,7 +21,7 @@ import ch.qos.logback.classic.sift.SiftingAppender;
 import ch.qos.logback.classic.spi.ILoggingEvent;
 import ch.qos.logback.core.spi.AppenderAttachable;
 import com.boncfc.ide.plugin.task.api.TaskConstants;
-import com.boncfc.ide.server.worker.constants.Constants;
+import com.boncfc.ide.plugin.task.api.constants.Constants;
 import com.boncfc.ide.plugin.task.api.constants.DateConstants;
 import com.boncfc.ide.server.worker.common.log.TaskLogDiscriminator;
 import lombok.AllArgsConstructor;
@@ -169,29 +169,13 @@ public class LogUtils {
         MDC.put(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY, taskInstanceLogFullPath);
     }
 
-    public static void removeTaskInstanceLogFullPathMDC() {
-        MDC.remove(TASK_INSTANCE_LOG_FULL_PATH_MDC_KEY);
-    }
-
     public static void setJobInstanceIDMDC(Integer jobInstanceID) {
         MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(jobInstanceID));
     }
 
-    public static void setWorkflowInstanceIdMDC(Integer workflowInstanceId) {
-        MDC.put(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY, String.valueOf(workflowInstanceId));
-    }
-
-    public static void setTaskInstanceIdMDC(Integer taskInstanceId) {
-        MDC.put(Constants.TASK_INSTANCE_ID_MDC_KEY, String.valueOf(taskInstanceId));
-    }
 
     public static void removeWorkflowAndTaskInstanceIdMDC() {
-        removeWorkflowInstanceIdMDC();
         removeJobInstanceIdMDC();
-    }
-
-    public static void removeWorkflowInstanceIdMDC() {
-        MDC.remove(Constants.WORKFLOW_INSTANCE_ID_MDC_KEY);
     }
 
     public static void removeJobInstanceIdMDC() {

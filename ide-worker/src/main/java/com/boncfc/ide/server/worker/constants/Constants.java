@@ -27,8 +27,6 @@ public final class Constants {
 
     public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
 
-    public static final String TASK_INSTANCE_ID_MDC_KEY = "jobInst.id";
-
     /**
      * sleep 1000ms
      */

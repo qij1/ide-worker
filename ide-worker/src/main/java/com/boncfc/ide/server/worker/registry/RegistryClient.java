@@ -11,6 +11,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import com.boncfc.ide.plugin.task.api.utils.JSONUtils;
 import com.boncfc.ide.server.worker.common.IStoppable;
 import com.boncfc.ide.server.worker.common.Server;
 import com.boncfc.ide.server.worker.common.model.AlertServerHeartBeat;
@@ -18,7 +19,6 @@ import com.boncfc.ide.server.worker.common.model.MasterHeartBeat;
 import com.boncfc.ide.server.worker.common.model.WorkerHeartBeat;
 import com.boncfc.ide.server.worker.constants.Constants;
 import com.boncfc.ide.server.worker.registry.enums.RegistryNodeType;
-import com.boncfc.ide.server.worker.utils.JSONUtils;
 import com.google.common.base.Strings;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
@@ -41,6 +41,7 @@ public class RegistryClient {
         this.registry = registry;
         registry.put(RegistryNodeType.WORKER.getRegistryPath(), EMPTY, false);
         registry.put(RegistryNodeType.ALERT_SERVER.getRegistryPath(), EMPTY, false);
+        registry.put(RegistryNodeType.JOB_INSTANCE_BASE.getRegistryPath(), EMPTY, false);
     }
 
     public boolean isConnected() {

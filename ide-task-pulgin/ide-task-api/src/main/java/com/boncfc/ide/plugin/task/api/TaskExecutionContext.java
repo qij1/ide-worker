@@ -39,6 +39,8 @@ import java.util.Map;
 @JsonInclude(JsonInclude.Include.NON_NULL)
 public class TaskExecutionContext implements Serializable {
 
+    private String tenantCode = "root";
+
     private JobInstance jobInstance;
 
     private List<JobInstanceParams> jobInstanceParamsList;
@@ -53,6 +55,7 @@ public class TaskExecutionContext implements Serializable {
 
     private int processId;
 
+    private String appId;
     /**
      * task timeout
      */

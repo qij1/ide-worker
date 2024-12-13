@@ -192,16 +192,31 @@
         delete from JOB_INSTANCE_QUEUE where JI_ID = #{jiId}
     </delete>
 
+    <update id="deleteJobInstanceParams" parameterType="string">
+        update JOB_INSTANCE_PARAMS
+        set DELETED = 'Y'
+        where JI_ID = #{jiId}
+    </update>
+
     <insert id="addJobInstanceParams" parameterType="com.boncfc.ide.plugin.task.api.model.JobInstanceParams">
-        insert into JOB_INSTANCE_PARAMS(jfi_id, ji_id, job_param_id, param_id, param_name,
+        insert into JOB_INSTANCE_PARAMS(jip_id, jfi_id, ji_id, job_param_id, param_id, param_name,
         is_preset, job_param_type, data_type, param_type, param_value)
-        select * from (
+        select SEQ_JOB_INSTANCE_PARAMS, m* from (
         <foreach collection="jobInstanceParams" item="jip" index="index" separator="union all">
             select #{jip.jfiId},#{jip.jiId},#{jip.jobParamId},#{jip.paramId},#{jip.paramName},
             #{jip.isPreset},#{jip.jobParamType},#{jip.dataType},#{jip.paramType},#{jip.paramValue}
             from dual
         </foreach>
         ) m
+    </insert>
+
+    <insert id="addJobInstanceIds" parameterType="com.boncfc.ide.plugin.task.api.model.JobInstanceIds">
+        insert into JOB_INSTANCE_IDS(ji_id, id_type, id_value, create_time)
+        select SEQ_JOB_INSTANCE_IDS.nextval,m.* from (
+        <foreach collection="jobInstanceIdsList" item="jiids" index="index" separator="union all">
+            select  #{jiids.idType}, #{jiids.idValue}, sysdate from dual
+        </foreach>
+        )m
     </insert>
 
     <select id="getDatasourceDetailInfoList" resultType="com.boncfc.ide.plugin.task.api.model.DatasourceDetailInfo">

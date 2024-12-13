@@ -19,6 +19,8 @@ package com.boncfc.ide.server.worker.utils;
 
 import com.boncfc.ide.plugin.task.api.TaskConstants;
 import com.boncfc.ide.plugin.task.api.TaskExecutionContext;
+import com.boncfc.ide.plugin.task.api.constants.Constants;
+import com.boncfc.ide.plugin.task.api.utils.HttpUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -126,17 +128,23 @@ public final class ProcessUtils {
         return String.join(" ", allPidList).trim();
     }
 
-    /**
-     * cancel k8s / yarn application
-     *
-     * @param taskExecutionContext
-     * @return
-     */
-    public static void cancelApplication(TaskExecutionContext taskExecutionContext) {
+    public static void cancelApplication(String url, String appId) {
         try {
-
+            stopYarnJob(url, appId);
         } catch (Exception e) {
             log.error("Cancel application failed: {}", e.getMessage());
+        }
+    }
+
+
+    public static void stopYarnJob(String url, String appId) {
+        String yarnUrl = String.format(url, appId);
+        String result = HttpUtils.stopYarnJob(yarnUrl);
+        // 如果yarn上的job没有被杀死，就终止sql的执行来补刀
+        if (Constants.YARN_JOB_KILLED.equalsIgnoreCase(result)) {
+            log.info("SqlJob stopYarnJob成功!");
+        } else {
+            log.info("SqlJob stopYarnJob code=[{}]", result);
         }
     }
 }

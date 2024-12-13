@@ -17,21 +17,18 @@
 
 package com.boncfc.ide.plugin.task.api;
 
-import com.boncfc.ide.plugin.task.api.datasource.mysql.MySQLDataSourceProcessor;
-import com.boncfc.ide.plugin.task.api.model.TaskExecutionStatus;
 import com.boncfc.ide.plugin.task.api.model.JobInstanceParams;
+import com.boncfc.ide.plugin.task.api.model.TaskExecutionStatus;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 
-import java.util.*;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.StringJoiner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
-import java.util.stream.Collectors;
-
-import static com.boncfc.ide.plugin.task.api.model.JobParamType.OUT;
-import static com.boncfc.ide.plugin.task.api.model.ParamType.RUNTIME;
 
 @Slf4j
 public abstract class AbstractTask {

@@ -34,17 +34,17 @@ public interface DataSourceProcessor {
     String getDatasourceUniqueId(ConnectionParam connectionParam, DbType dbType);
 
     /**
+     * get datasource Driver
+     */
+    String getDatasourceDriver();
+
+    /**
      * deserialize json to datasource connection param
      *
      * @param connectionJson {@code org.apache.dolphinscheduler.dao.entity.DataSource.connectionParams}
      * @return {@link BaseConnectionParam}
      */
     ConnectionParam createConnectionParams(DatasourceDetailInfo connectionJson);
-
-    /**
-     * get datasource Driver
-     */
-    String getDatasourceDriver();
 
     /**
      * get validation Query
