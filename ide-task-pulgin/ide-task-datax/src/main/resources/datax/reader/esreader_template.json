@@ -1,0 +1,14 @@
+{
+  "name": "elasticsearchreader",
+  "parameter": {
+    "query": "",
+    "endpoint": "",
+    "accessId": "",
+    "accessKey": "",
+    "index": "",
+    "type": "",
+    "discovery": false,
+    "batchSize": 4096,
+    "column": []
+  }
+}

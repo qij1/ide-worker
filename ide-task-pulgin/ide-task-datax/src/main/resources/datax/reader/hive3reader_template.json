@@ -1,0 +1,23 @@
+{
+  "name": "hive3reader",
+  "parameter": {
+    "fileType": "text",
+    "fieldDelimiter" :"\u0001",
+    "connection": {
+      "appName": "",
+      "databaseName": "",
+      "querySql": "",
+      "jdbcUrl": "",
+      "username": "",
+      "password": ""
+    },
+    "defaultFS": "",
+    "clusterConfigPath": "",
+    "encoding": "UTF-8",
+    "nullFormat": "\\N",
+    "havekerberos": true,
+    "krbconfFilePath": "",
+    "kerberosKeytabFilePath": "",
+    "kerberosPrincipal": ""
+  }
+}

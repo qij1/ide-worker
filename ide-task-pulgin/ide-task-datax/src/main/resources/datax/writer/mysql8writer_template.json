@@ -1,0 +1,24 @@
+{
+  "name": "mysql5writer",
+  "parameter": {
+    "writeMode": "insert",
+    "username": "",
+    "password": "",
+    "batchSize": "1024",
+    "column": [
+      "*"
+    ],
+    "preSql": [
+    ],
+    "postSql": [
+    ],
+    "connection": [
+      {
+        "jdbcUrl": "",
+        "table": [
+          ""
+        ]
+      }
+    ]
+  }
+}

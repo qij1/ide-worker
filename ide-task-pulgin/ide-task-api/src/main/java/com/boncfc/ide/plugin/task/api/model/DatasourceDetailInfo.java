@@ -27,4 +27,6 @@ public class DatasourceDetailInfo {
     String krbKeytabsDir;
     String indexName;
     String dsPasswordAESKey;
+    String pluginName;
+    String pluginType;
 }

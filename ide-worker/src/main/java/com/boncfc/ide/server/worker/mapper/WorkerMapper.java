@@ -36,7 +36,7 @@ public interface WorkerMapper {
 
     int addJobInstanceIds(@Param("jobInstanceIdsList") List<JobInstanceIds> jobInstanceIdsList);
 
-    List<DatasourceDetailInfo> getDatasourceDetailInfoList(@Param("dsIds") List<Integer> dsIds);
+    List<DatasourceDetailInfo> getDatasourceDetailInfoList(@Param("dsIds") List<Integer> dsIds, @Param("pluginType") String pluginType);
 
 
 }

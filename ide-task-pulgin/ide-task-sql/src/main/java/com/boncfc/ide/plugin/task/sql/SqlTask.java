@@ -63,11 +63,10 @@ public class SqlTask extends AbstractTask {
         super(taskExecutionContext);
         this.taskExecutionContext = taskExecutionContext;
         this.sqlJobConf = (SqlJobConf) taskExecutionContext.getJobConf();
-        if (taskExecutionContext.getDatasourceDetailInfoMap() == null ||
-                taskExecutionContext.getDatasourceDetailInfoMap().get(sqlJobConf.getDsId()) == null) {
-            throw new TaskException("unbound data source");
+        if (taskExecutionContext.getDatasourceDetailInfoList().size() != 1) {
+            throw new TaskException("unbound data source or more than one datasoure");
         }
-        DatasourceDetailInfo detailInfo = taskExecutionContext.getDatasourceDetailInfoMap().get(sqlJobConf.getDsId());
+        DatasourceDetailInfo detailInfo = taskExecutionContext.getDatasourceDetailInfoList().get(0);
         dbType = DbType.valueOf(detailInfo.getDsType());
         connectionParam = DataSourceUtils.buildConnectionParams(dbType, detailInfo);
 
@@ -145,8 +144,7 @@ public class SqlTask extends AbstractTask {
             int num = md.getColumnCount();
             while (resultSet.next()) {
                 for (int i = 1; i <= num; i++) {
-                    jobInstanceParams.get(i - 1).setParamValue(
-                            String.valueOf(JSONUtils.toJsonNode(resultSet.getObject(i))));
+                    jobInstanceParams.get(i - 1).setParamValue(String.valueOf(resultSet.getObject(i)));
                 }
                 break;
             }

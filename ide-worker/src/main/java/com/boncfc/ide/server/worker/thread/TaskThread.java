@@ -38,6 +38,7 @@ import java.util.stream.Collectors;
 import static com.boncfc.ide.plugin.task.api.AbstractTask.groupName;
 import static com.boncfc.ide.plugin.task.api.AbstractTask.rgex;
 import static com.boncfc.ide.plugin.task.api.constants.Constants.NO;
+import static com.boncfc.ide.plugin.task.api.constants.JobType.DT;
 
 @Slf4j
 @Component
@@ -100,12 +101,12 @@ public class TaskThread implements Runnable {
                             addJobConfPersetParam(jobDetails.getJobConf(), jobInstanceParamsList);
                             parseJobInstanceParams(jobInstance, jobInstanceParamsList);
                             // 任务上下文环境
-                            TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder().
-                                    jobDetails(jobDetails).
-                                    jobType(jobDetails.getJobType()).
-                                    jobInstance(jobInstance).
-                                    jobInstanceParamsList(jobInstanceParamsList).
-                                    build();
+                            TaskExecutionContext taskExecutionContext = TaskExecutionContext.builder()
+                                    .jobDetails(jobDetails)
+                                    .jobType(jobDetails.getJobType())
+                                    .jobInstance(jobInstance)
+                                    .jobInstanceParamsList(jobInstanceParamsList)
+                                    .build();
                             // 解析任务配置和数据源信息
                             parseJobConf(taskExecutionContext, jobDetails.getJobConf(),
                                     JobType.valueOf(jobDetails.getJobType()));
@@ -158,60 +159,26 @@ public class TaskThread implements Runnable {
         while (m.find()) {
             String paramName = m.group(groupName);
             JobInstanceParams prop = paramsPropsMap.get(paramName);
-            if(prop == null) {
+            if (prop == null) {
                 // 去永久参数里找
                 JobInstanceParams jobInstanceParams = workerMapper.getPersetParams(paramName);
-                if(jobInstanceParams != null) jobInstanceParamsList.add(jobInstanceParams);
+                if (jobInstanceParams != null) jobInstanceParamsList.add(jobInstanceParams);
 
             }
         }
     }
-    public static void main(String[] args) {
-        String jsonDatax = "{\n" +
-                "   \"readers\":[{\"dsName\":\"mall1\", \"dsId\":\"3659582275830784\", \"querySql\": \"select 1\", \"dsType\":\"oracle\"}," +
-                "                {\"dsName\": \"mall2\", \"dsId\": \"3659582275830784\", \"querySql\": \"select 1\", \"dsType\": \"oracle\"}]," +
-                "    \"writers\":[{\"dsName\":\"test1\", \"dsId\": \"3553264497476608\", \"tableName\": \"test\", \"preSql\":\" \",\"postSql\":\" \",\"batchSize\":\"512\"}," +
-                "                 {\"dsName\":\"test2\",\"dsId\": \"3553264497476608\", \"tableName\": \"test\",  \"preSql\":\" \",\"postSql\":\"\",\"batchSize\":\"512\"}]\n" +
-                "    }";
-        String jsonSql = "{\n" +
-                " \"dsId\": 1,\n" +
-                " \"querySql\":\"insert into TEST_TABLE(id, name, sex) VALUES (1, 'aaaaaa', '0');\\n" +
-                "                select name from TEST_TABLE where sex = 0;\"\n" +
-                "}";
-        String jsonConditional = "";
-        String jsonCheck = "{" +
-                "\"dsId\":\"test1\"," +
-                "\"checkSql\":\"\"," +
-                "\"operator\":\">\", " +
-                "\"threshold\":\"\"," +
-                "\"thresholdType\":\"string\",\n" +
-                "\"validationType\":\"strong\"\n" +
-                "}";
-        String jsonShell = "{" +
-                "  \"user\":\"test\"," +
-                "  \"shell\":\"\"" +
-                "}";
-        String jsonHttp = "{\n" +
-                "   \"requestUrl\":\"\",\n" +
-                "   \"requestMethod\":\"GET\",\n" +
-                "   \"requestHeaders\":[{\"content-type\":\"\"}],\n" +
-                "   \"requestBody\":\"\",\n" +
-                "   \"responseHeaders\":[{\"content-type\":\"\"}],\n" +
-                "   \"ack\":true,\n" +
-                "   \"ackKey\":\"\",\n" +
-                "   \"ackValue\":\"\",\n" +
-                "   \"ackValueType\":\"string|number|boolean\",\n" +
-                "   \"stopRequestUrl\":\"\",\n" +
-                "   \"stopRequestMethod\":\"GET\",\n" +
-                "   \"stopRequestHeaders\":[{\"content-type\":\"\"}]\n" +
-                "}";
-        SqlJobConf jsonObject = JSONUtils.parseObject(jsonSql, SqlJobConf.class);
-        System.out.println(jsonObject);
-    }
 
+    /**
+     * 解析任务的配置信息：jobConf、datasource etc.
+     *
+     * @param taskExecutionContext
+     * @param jobConfJson
+     * @param jobType
+     */
     private void parseJobConf(TaskExecutionContext taskExecutionContext, String jobConfJson, JobType jobType) {
-        List<Integer> dsIds = new LinkedList<>();
         JobConf jobConf = null;
+        List<Integer> dsIds = new LinkedList<>();
+        Map<String, List<Integer>> dataxDsIdMap = new HashMap<>();
         switch (jobType) {
             case HTTP:
                 jobConf = JSONUtils.parseObject(jobConfJson, HttpJobConf.class);
@@ -240,9 +207,13 @@ public class TaskThread implements Runnable {
                     ((DataxJobConf) jobConf).getReaders().forEach(reader -> {
                         dsIds.add(reader.getDsId());
                     });
+                    dataxDsIdMap.put(DataxPluginType.READER.name(), dsIds);
+                    dsIds.clear();
                     ((DataxJobConf) jobConf).getWriters().forEach(writer -> {
                         dsIds.add(writer.getDsId());
                     });
+                    dataxDsIdMap.put(DataxPluginType.WRITER.name(), dsIds);
+
                 }
                 break;
             default:
@@ -253,15 +224,25 @@ public class TaskThread implements Runnable {
             taskExecutionContext.setJobConf(jobConf);
         }
 
-        if (!dsIds.isEmpty()) {
-            List<DatasourceDetailInfo> datasourceDetailInfoList = workerMapper.getDatasourceDetailInfoList(dsIds);
+        List<DatasourceDetailInfo> datasourceDetailInfoList = new ArrayList<>();
+        if (!dsIds.isEmpty() || !dataxDsIdMap.isEmpty()) {
+            if (jobType != DT) {
+                datasourceDetailInfoList = workerMapper.getDatasourceDetailInfoList(dsIds, null);
+            } else {
+                getDataxJobDsInfo(dataxDsIdMap, datasourceDetailInfoList);
+            }
             datasourceDetailInfoList.forEach(datasourceDetailInfo -> {
                 datasourceDetailInfo.setDsPasswordAESKey(workerConfig.getDatasourcePasswordAesKey());
             });
-            Map<Integer, DatasourceDetailInfo> datasourceDetailInfoMap = datasourceDetailInfoList.stream().collect(
-                    Collectors.toMap(DatasourceDetailInfo::getDsId, Function.identity()));
-            taskExecutionContext.setDatasourceDetailInfoMap(datasourceDetailInfoMap);
         }
+
+    }
+
+    private void getDataxJobDsInfo(Map<String, List<Integer>> dataxDsIdMap, List<DatasourceDetailInfo> datasourceDetailInfoList) {
+        List<DatasourceDetailInfo> datasourceDetailInfoReaderList = workerMapper.getDatasourceDetailInfoList(dataxDsIdMap.get(DataxPluginType.READER.name()), DataxPluginType.READER.name());
+        List<DatasourceDetailInfo> datasourceDetailInfoWriterList = workerMapper.getDatasourceDetailInfoList(dataxDsIdMap.get(DataxPluginType.WRITER.name()), DataxPluginType.WRITER.name());
+        datasourceDetailInfoList.addAll(datasourceDetailInfoReaderList);
+        datasourceDetailInfoList.addAll(datasourceDetailInfoWriterList);
     }
 
     private void initTaskThread() {

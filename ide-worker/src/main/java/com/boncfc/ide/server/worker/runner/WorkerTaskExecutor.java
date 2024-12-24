@@ -108,7 +108,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         try {
             task.cancel();
             // 如果有提交上 Yarn，需要补充杀死一下
-            if(taskExecutionContext.getAppId() != null && !taskExecutionContext.getAppId().isEmpty()) {
+            if (taskExecutionContext.getAppId() != null && !taskExecutionContext.getAppId().isEmpty()) {
                 ProcessUtils.stopYarnJob(yarnConfig.getApplicationState(), taskExecutionContext.getAppId());
             }
             return true;
@@ -121,7 +121,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
 
     @Override
     public void run() {
-        Thread.currentThread().setName("TaskLog-"+taskExecutionContext.getJobInstance().getJiId());
+        Thread.currentThread().setName("TaskLog-" + taskExecutionContext.getJobInstance().getJiId());
         try {
             JobInstance jobInstance = taskExecutionContext.getJobInstance();
             LogUtils.setJobInstanceIDMDC(jobInstance.getJiId());
@@ -170,10 +170,12 @@ public abstract class WorkerTaskExecutor implements Runnable {
         updateJobInstanceStatus(JobInstanceStatus.inp, JobInstanceExtStatus.inp_torun);
         log.info("add jobinstance params,jiId {}", taskExecutionContext.getJobInstance().getJiId());
         workerMapper.deleteJobInstanceParams(String.valueOf(taskExecutionContext.getJobInstance().getJiId()));
-        workerMapper.addJobInstanceParams(taskExecutionContext.getJobInstanceParamsList().stream()
-                .filter(jobInstanceParams -> IN.name().equals(jobInstanceParams.getJobParamType()) ||
-                                             !RUNTIME.name().equals(jobInstanceParams.getParamType()))
-                .collect(Collectors.toList()));
+        List<JobInstanceParams> jobInstanceParamsList = taskExecutionContext.getJobInstanceParamsList().stream()
+                .filter(jobInstanceParams -> NO.equals(jobInstanceParams.getIsPreset()) &&
+                        (IN.name().equals(jobInstanceParams.getJobParamType()) ||
+                                !RUNTIME.name().equals(jobInstanceParams.getParamType())))
+                .collect(Collectors.toList());
+        if(!jobInstanceParamsList.isEmpty()) workerMapper.addJobInstanceParams(jobInstanceParamsList);
 
         TaskChannel taskChannel =
                 Optional.ofNullable(TaskPluginManager.getTaskChannelMap().get(taskExecutionContext.getJobType()))
@@ -212,7 +214,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         taskExecutionContext.getJobInstance().setUpdateTime(DateUtils.getCurrentDate());
         TaskExecutionStatus taskExecutionStatus = task.getExitStatus();
 
-        if(taskExecutionStatus.isSuccess()) {
+        if (taskExecutionStatus.isSuccess()) {
             updateJobInstanceStatus(JobInstanceStatus.success, JobInstanceExtStatus.success_normal);
         } else if (taskExecutionStatus.isFailure()) {
             updateJobInstanceStatus(JobInstanceStatus.fail, JobInstanceExtStatus.fail_normal);
@@ -221,7 +223,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
         }
 
         List<JobInstanceIds> jobInstanceIdsList = new LinkedList<>();
-        if(taskExecutionContext.getAppId() != null && !taskExecutionContext.getAppId().isEmpty()) {
+        if (taskExecutionContext.getAppId() != null && !taskExecutionContext.getAppId().isEmpty()) {
             JobInstanceIds jobInstanceIds = JobInstanceIds.builder()
                     .jiId(taskExecutionContext.getJobInstance().getJiId())
                     .idType(APPLICATION_ID)
@@ -230,7 +232,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
             jobInstanceIdsList.add(jobInstanceIds);
         }
 
-        if(0 != taskExecutionContext.getProcessId()) {
+        if (0 != taskExecutionContext.getProcessId()) {
             JobInstanceIds jobInstanceIds = JobInstanceIds.builder()
                     .jiId(taskExecutionContext.getJobInstance().getJiId())
                     .idType(PID)
@@ -238,14 +240,14 @@ public abstract class WorkerTaskExecutor implements Runnable {
                     .build();
             jobInstanceIdsList.add(jobInstanceIds);
         }
-        if(!jobInstanceIdsList.isEmpty()) workerMapper.addJobInstanceIds(jobInstanceIdsList);
+        if (!jobInstanceIdsList.isEmpty()) workerMapper.addJobInstanceIds(jobInstanceIdsList);
 
         // 输出参数
         List<JobInstanceParams> jobInstanceParams = this.taskExecutionContext.getJobInstanceParamsList().stream()
                 .filter(jp -> OUT.name().equals(jp.getJobParamType()) && RUNTIME.name().equals(jp.getParamType()))
                 .sorted(Comparator.comparing(JobInstanceParams::getSortIndex))
                 .collect(Collectors.toList());
-        if(!jobInstanceIdsList.isEmpty()) workerMapper.addJobInstanceParams(jobInstanceParams);
+        if (!jobInstanceParams.isEmpty()) workerMapper.addJobInstanceParams(jobInstanceParams);
     }
 
     protected void closeLogAppender() {

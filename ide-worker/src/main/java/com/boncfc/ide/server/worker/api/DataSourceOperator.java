@@ -35,7 +35,7 @@ public class DataSourceOperator {
     public Result testConnect(@PathVariable(value = "dsId") Integer dsId) {
         List<Integer> dsIds = new LinkedList<>();
         dsIds.add(dsId);
-        List<DatasourceDetailInfo> datasourceDetailInfoList = workerMapper.getDatasourceDetailInfoList(dsIds);
+        List<DatasourceDetailInfo> datasourceDetailInfoList = workerMapper.getDatasourceDetailInfoList(dsIds, null);
         datasourceDetailInfoList.forEach(datasourceDetailInfo -> {
             datasourceDetailInfo.setDsPasswordAESKey(workerConfig.getDatasourcePasswordAesKey());
         });

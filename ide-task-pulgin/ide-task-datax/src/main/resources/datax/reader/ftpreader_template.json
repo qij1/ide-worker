@@ -1,0 +1,20 @@
+{
+  "name": "ftpreader",
+  "parameter": {
+    "column": [
+      "*"
+    ],
+    "host": "",
+    "port": "",
+    "username": "",
+    "password": "",
+    "protocol": "",
+    "encoding": "UTF-8",
+    "fieldDelimiter": ",",
+    "nullFormat": "",
+    "skipHeader": "true",
+    "timeout": "7200000",
+    "path": [
+    ]
+  }
+}

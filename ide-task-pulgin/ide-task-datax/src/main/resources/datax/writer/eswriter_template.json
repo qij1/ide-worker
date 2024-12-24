@@ -1,0 +1,14 @@
+{
+  "name": "elasticsearchwriter",
+  "parameter": {
+    "endpoint": "",
+    "accessId": "",
+    "accessKey": "",
+    "index": "",
+    "type": "",
+    "cleanup": false,
+    "batchSize": 512,
+    "ignoreParseError": false,
+    "column": []
+  }
+}

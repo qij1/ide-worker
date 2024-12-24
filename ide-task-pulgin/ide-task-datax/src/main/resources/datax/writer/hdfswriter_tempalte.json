@@ -1,0 +1,19 @@
+{
+  "name": "hdfswriter",
+  "parameter": {
+    "defaultFS": "",
+    "fileType": "",
+    "path": "",
+    "fileName": "",
+    "column": [],
+    "writeMode": "",
+    "fieldDelimiter": "",
+    "compress":"",
+    "clusterConfigPath": "",
+    "encoding": "UTF-8",
+    "havekerberos": true,
+    "krbconfFilePath": "",
+    "kerberosPrincipal": "",
+    "kerberosKeytabFilePath": ""
+  }
+}

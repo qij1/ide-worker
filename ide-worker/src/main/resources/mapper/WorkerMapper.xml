@@ -106,8 +106,9 @@
         and jip.JFI_ID = #{jfiId}
     </select>
 
-    <select id="getPersetParams" parameterType="string" resultType="com.boncfc.ide.plugin.task.api.model.JobInstanceParams">
-        select ''  JOB_PARAM_ID,
+    <select id="getPersetParams" parameterType="string"
+            resultType="com.boncfc.ide.plugin.task.api.model.JobInstanceParams">
+        select '' JOB_PARAM_ID,
         p.PARAM_ID,
         'N' IS_UPSTREAM_OUTPUT,
         0 SORT_INDEX,
@@ -135,7 +136,7 @@
         on rp.PARAM_ID = p.PARAM_ID
         and p.PARAM_TYPE = 'RUNTIME'
         and rp.DELETED = 'N'
-        where  IS_PRESET = 'Y'
+        where IS_PRESET = 'Y'
         and PARAM_NAME = #{paramName}
     </select>
 
@@ -201,7 +202,7 @@
     <insert id="addJobInstanceParams" parameterType="com.boncfc.ide.plugin.task.api.model.JobInstanceParams">
         insert into JOB_INSTANCE_PARAMS(jip_id, jfi_id, ji_id, job_param_id, param_id, param_name,
         is_preset, job_param_type, data_type, param_type, param_value)
-        select SEQ_JOB_INSTANCE_PARAMS, m* from (
+        select SEQ_JOB_INSTANCE_PARAMS.nextval, m.* from (
         <foreach collection="jobInstanceParams" item="jip" index="index" separator="union all">
             select #{jip.jfiId},#{jip.jiId},#{jip.jobParamId},#{jip.paramId},#{jip.paramName},
             #{jip.isPreset},#{jip.jobParamType},#{jip.dataType},#{jip.paramType},#{jip.paramValue}
@@ -214,37 +215,65 @@
         insert into JOB_INSTANCE_IDS(ji_id, id_type, id_value, create_time)
         select SEQ_JOB_INSTANCE_IDS.nextval,m.* from (
         <foreach collection="jobInstanceIdsList" item="jiids" index="index" separator="union all">
-            select  #{jiids.idType}, #{jiids.idValue}, sysdate from dual
+            select #{jiids.idType}, #{jiids.idValue}, sysdate from dual
         </foreach>
         )m
     </insert>
 
     <select id="getDatasourceDetailInfoList" resultType="com.boncfc.ide.plugin.task.api.model.DatasourceDetailInfo">
-        select ds.DS_ID, ds.DS_TYPE,ds.DS_NAME,ds.DS_CONF,
-            dc.CLASS_NAME, dc.DRIVER_NAME, dc.DRIVER_TYPE, dc.DRIVER_VERSION, dc.JAR_DIR,dc.JAR_FILE_NAME,
-            clusters.CLUSTER_NAME, clusters.DEPENDENCY_JARS_DIR, clusters.HADOOP_CONF_DIR, clusters.KRB_CONF_PATH,
-            clusters.KRB_KEYTABS_DIR, dei.INDEX_NAME
+        select ds.DS_ID,
+            ds.DS_TYPE,
+            ds.DS_NAME,
+            ds.DS_CONF,
+            dc.CLASS_NAME,
+            dc.DRIVER_NAME,
+            dc.DRIVER_TYPE,
+            dc.DRIVER_VERSION,
+            dc.JAR_DIR,
+            dc.JAR_FILE_NAME,
+            clusters.CLUSTER_NAME,
+            clusters.DEPENDENCY_JARS_DIR,
+            clusters.HADOOP_CONF_DIR,
+            clusters.KRB_CONF_PATH,
+            clusters.KRB_KEYTABS_DIR,
+            dei.INDEX_NAME,
+            pl.PLUGIN_NAME,
+            pl.PLUGIN_TYPE
         from DATASOURCES ds
         left join DRIVER_CONFIGS dc
             on ds.DRIVER_ID = dc.DRIVER_ID
             and ds.DELETED = 'N'
-        left join (
-            select dcr.DS_ID, ccc.CLUSTER_ID, c.CLUSTER_NAME, c.CLUSTER_TYPE,
-                ccc.DEPENDENCY_JARS_DIR, ccc.HADOOP_CONF_DIR,
-                ccc.KRB_CONF_PATH, ccc.KRB_KEYTABS_DIR
-            from DS_CLUSTER_REL dcr
-            inner join CLUSTERS c
-                on dcr.CLUSTER_ID = c.CLUSTER_ID
-                and c.DELETED = 'N'
-            inner join CDP_CLUSTER_CONFIGS ccc
-                on c.CLUSTER_ID = ccc.CLUSTER_ID
-        ) clusters
+        left join (select dcr.DS_ID,
+                        ccc.CLUSTER_ID,
+                        c.CLUSTER_NAME,
+                        c.CLUSTER_TYPE,
+                        ccc.DEPENDENCY_JARS_DIR,
+                        ccc.HADOOP_CONF_DIR,
+                        ccc.KRB_CONF_PATH,
+                        ccc.KRB_KEYTABS_DIR
+                    from DS_CLUSTER_REL dcr
+                    inner join CLUSTERS c
+                        on dcr.CLUSTER_ID = c.CLUSTER_ID
+                        and c.DELETED = 'N'
+                    inner join CDP_CLUSTER_CONFIGS ccc
+                        on c.CLUSTER_ID = ccc.CLUSTER_ID) clusters
             on clusters.DS_ID = ds.DS_ID
             and ds.DS_TYPE in ('HIVE', 'IMPALA')
             and ds.DELETED = 'N'
         left join DS_ES_INDEX dei
             on ds.DS_ID = dei.DS_ID
             and ds.DS_TYPE = 'ES'
+        left join (
+            select dpr.DS_ID, dpc.DPC_ID, dpc.PLUGIN_NAME, dpc.PLUGIN_TYPE
+            from DATAX_PLUGIN_CONFIGS dpc
+            inner join DS_PLUGIN_REL dpr
+            on dpc.DPC_ID = dpr.DPC_ID
+            <where>
+                <if test="pluginType != null">
+                    dpc.PLUGIN_TYPE = #{pluginType}
+                </if>
+            </where>
+        ) pl on pl.DS_ID = ds.DS_ID
         <where>
             <foreach item="dsId" index="index" collection="dsIds"
                      open="ds.DS_ID in (" separator="," close=")" nullable="true">

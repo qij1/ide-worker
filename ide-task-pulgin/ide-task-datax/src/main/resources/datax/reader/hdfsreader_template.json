@@ -1,0 +1,18 @@
+{
+  "name": "hdfsreader",
+  "parameter": {
+    "path": "",
+    "defaultFS": "",
+    "column": [
+     "*"
+    ],
+    "fileType": "",
+    "encoding": "UTF-8",
+    "fieldDelimiter": ",",
+    "clusterConfigPath": "",
+    "havekerberos": true,
+    "krbconfFilePath": "",
+    "kerberosPrincipal": "",
+    "kerberosKeytabFilePath": ""
+  }
+}

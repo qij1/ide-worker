@@ -1,0 +1,24 @@
+{
+  "name": "ftpwriter",
+  "parameter": {
+    "writeMode": "truncate",
+    "host": "",
+    "port": "21",
+    "username": "",
+    "password": "",
+    "protocol": "",
+    "connectPattern": "PASV",
+    "path": "",
+    "fileName": "",
+    "dateFormat": "yyyy-MM-dd",
+    "encoding": "UTF-8",
+    "fieldDelimiter": "",
+    "nullFormat": "",
+    "timeout": "7200000",
+    "split": {
+      "unit" : "",
+      "averageUnitNumber": 0,
+      "maxFileCount": 0
+    }
+  }
+}

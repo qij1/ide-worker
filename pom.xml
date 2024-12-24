@@ -16,8 +16,8 @@
     <name>ide-worker-parent</name>
 
     <modules>
-        <module>ide-worker</module>
         <module>ide-task-pulgin</module>
+        <module>ide-worker</module>
     </modules>
 
     <properties>

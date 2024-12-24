@@ -1,0 +1,9 @@
+{
+  "name": "kafkawriter",
+  "parameter": {
+    "bootstrapServers": "",
+    "topic": "",
+    "batchSize": 50,
+    "column": []
+  }
+}

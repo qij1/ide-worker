@@ -51,7 +51,7 @@ public class TaskExecutionContext implements Serializable {
 
     private JobConf jobConf;
 
-    private Map<Integer, DatasourceDetailInfo> datasourceDetailInfoMap;
+    private List<DatasourceDetailInfo> datasourceDetailInfoList;
 
     private int processId;
 

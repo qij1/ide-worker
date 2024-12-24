@@ -1,0 +1,32 @@
+{
+  "name": "impala3writer",
+  "parameter": {
+    "fileName":"",
+    "fileType": "text",
+    "writeMode": "append",
+    "fieldDelimiter" :"\u0001",
+    "column":["*"],
+    "databaseName":"",
+    "path": "",
+    "connection": {
+      "databaseName": "",
+      "hivePartition": "",
+      "jdbcUrl": "",
+      "username": "",
+      "password": "",
+      "preSql": "",
+      "postSql": "",
+      "setSql": ""
+    },
+    "defaultFS": "",
+    "clusterConfigPath":"",
+    "haveKerberos": true,
+    "krbConfFilePath": "",
+    "kerberosPrincipal": "",
+    "kerberosKeytabFilePath": "",
+    "kerberosHivePrincipal": "",
+    "kerberosHiveKeytabFilePath": "",
+    "metastore": "",
+    "encoding": "UTF-8"
+  }
+}

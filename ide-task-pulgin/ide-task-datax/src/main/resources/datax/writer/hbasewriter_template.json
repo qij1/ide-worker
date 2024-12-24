@@ -1,0 +1,12 @@
+{
+  "name": "hbase11xwriter",
+  "parameter": {
+    "hbaseConfig": {},
+    "table": "",
+    "column": [],
+    "encoding": "",
+    "mode": "normal",
+    "truncate": false,
+    "rowkeyColumn": []
+  }
+}
