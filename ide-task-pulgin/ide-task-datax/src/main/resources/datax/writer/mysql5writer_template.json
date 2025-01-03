@@ -4,7 +4,7 @@
     "writeMode": "insert",
     "username": "",
     "password": "",
-    "batchSize": "1024",
+    "batchSize": 1024,
     "column": [
       "*"
     ],

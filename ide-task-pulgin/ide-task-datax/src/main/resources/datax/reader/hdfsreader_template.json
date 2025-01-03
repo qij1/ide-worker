@@ -6,10 +6,10 @@
     "column": [
      "*"
     ],
-    "fileType": "",
+    "fileType": "text",
     "encoding": "UTF-8",
     "fieldDelimiter": ",",
-    "clusterConfigPath": "",
+    "hadoopConfigPath": "",
     "havekerberos": true,
     "krbconfFilePath": "",
     "kerberosPrincipal": "",

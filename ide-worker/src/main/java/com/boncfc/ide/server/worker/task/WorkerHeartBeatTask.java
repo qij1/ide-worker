@@ -17,8 +17,10 @@
 
 package com.boncfc.ide.server.worker.task;
 
+import com.boncfc.ide.plugin.task.api.constants.ServerStatus;
+import com.boncfc.ide.plugin.task.api.lifecycle.ServerLifeCycleManager;
+import com.boncfc.ide.plugin.task.api.thread.BaseHeartBeatTask;
 import com.boncfc.ide.plugin.task.api.utils.JSONUtils;
-import com.boncfc.ide.server.worker.common.lifecycle.ServerLifeCycleManager;
 import com.boncfc.ide.server.worker.common.model.WorkerHeartBeat;
 import com.boncfc.ide.server.worker.config.SystemMetrics;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
@@ -26,10 +28,8 @@ import com.boncfc.ide.server.worker.config.WorkerServerLoadProtection;
 import com.boncfc.ide.server.worker.metrics.MetricsProvider;
 import com.boncfc.ide.server.worker.registry.RegistryClient;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorThreadPool;
-import com.boncfc.ide.server.worker.thread.BaseHeartBeatTask;
-import com.boncfc.ide.server.worker.utils.NetUtils;
-import com.boncfc.ide.server.worker.utils.OSUtils;
-import com.boncfc.ide.server.worker.common.ServerStatus;
+import com.boncfc.ide.plugin.task.api.utils.NetUtils;
+import com.boncfc.ide.plugin.task.api.utils.OSUtils;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;
 

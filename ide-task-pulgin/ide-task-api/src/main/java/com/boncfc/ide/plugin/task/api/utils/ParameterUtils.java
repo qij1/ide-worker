@@ -19,6 +19,7 @@ package com.boncfc.ide.plugin.task.api.utils;
 
 import com.boncfc.ide.plugin.task.api.model.ParamDataType;
 import com.boncfc.ide.plugin.task.api.parse.PlaceholderUtils;
+import com.boncfc.ide.plugin.task.api.parse.TimePlaceholderUtils;
 import org.apache.commons.lang3.StringUtils;
 
 import java.io.Serializable;
@@ -69,4 +70,49 @@ public class ParameterUtils {
         }
     }
 
+    public static String convertParameterPlaceholders(String parameterString, Map<String, String> parameterMap) {
+        if (StringUtils.isEmpty(parameterString)) {
+            return parameterString;
+        }
+        Date cronTime;
+        if (parameterMap != null && !parameterMap.isEmpty()) {
+            // replace variable ${} form,refers to the replacement of system variables and custom variables
+            parameterString = PlaceholderUtils.replacePlaceholders(parameterString, parameterMap, true);
+        }
+        if (parameterMap != null && null != parameterMap.get(PARAMETER_DATETIME)) {
+            // Get current time, schedule execute time
+            String cronTimeStr = parameterMap.get(PARAMETER_DATETIME);
+            cronTime = DateUtils.parse(cronTimeStr, PARAMETER_FORMAT_TIME);
+        } else {
+            cronTime = new Date();
+        }
+        // replace time $[...] form, eg. $[yyyyMMdd]
+        if (cronTime != null) {
+            return dateTemplateParse(parameterString, cronTime);
+        }
+        return parameterString;
+    }
+
+    private static String dateTemplateParse(String templateStr, Date date) {
+        if (templateStr == null) {
+            return null;
+        }
+
+        StringBuffer newValue = new StringBuffer(templateStr.length());
+
+        Matcher matcher = DATE_PARSE_PATTERN.matcher(templateStr);
+
+        while (matcher.find()) {
+            String key = matcher.group(1);
+            if (DATE_START_PATTERN.matcher(key).matches()) {
+                continue;
+            }
+            String value = TimePlaceholderUtils.getPlaceHolderTime(key, date);
+            matcher.appendReplacement(newValue, value);
+        }
+
+        matcher.appendTail(newValue);
+
+        return newValue.toString();
+    }
 }

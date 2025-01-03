@@ -16,8 +16,10 @@ import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
 
 import java.sql.Connection;
+import java.util.HashSet;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Set;
 
 @Slf4j
 @RestController
@@ -33,7 +35,7 @@ public class DataSourceOperator {
     @PostMapping(value = "/{dsId}/testconnect")
     @ResponseStatus(HttpStatus.OK)
     public Result testConnect(@PathVariable(value = "dsId") Integer dsId) {
-        List<Integer> dsIds = new LinkedList<>();
+        Set<Integer> dsIds = new HashSet();
         dsIds.add(dsId);
         List<DatasourceDetailInfo> datasourceDetailInfoList = workerMapper.getDatasourceDetailInfoList(dsIds, null);
         datasourceDetailInfoList.forEach(datasourceDetailInfo -> {

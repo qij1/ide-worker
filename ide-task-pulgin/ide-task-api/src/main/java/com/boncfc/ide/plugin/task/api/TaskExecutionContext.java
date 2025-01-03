@@ -53,13 +53,23 @@ public class TaskExecutionContext implements Serializable {
 
     private List<DatasourceDetailInfo> datasourceDetailInfoList;
 
+    /*
+     * task execute path
+     */
+    private DataxProperties dataxProperties;
+
     private int processId;
 
-    private String appId;
+    private String appId = "";
+
     /**
      * task timeout
      */
     private int taskTimeout;
+
+    private String applicationState;
+
+    private String taskAppId;
 
     private static final long serialVersionUID = -1L;
 

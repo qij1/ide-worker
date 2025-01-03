@@ -15,8 +15,8 @@
     "encoding": "UTF-8",
     "nullFormat": "\\N",
     "havekerberos": true,
-    "krbconfFilePath": "",
-    "kerberosKeytabFilePath": "",
-    "kerberosPrincipal": ""
+    "krbConfPath": "",
+    "krbKeytabPath": "",
+    "krbPrincipal": ""
   }
 }

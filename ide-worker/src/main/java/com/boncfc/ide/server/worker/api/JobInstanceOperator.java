@@ -4,19 +4,22 @@ import com.boncfc.ide.plugin.task.api.AbstractTask;
 import com.boncfc.ide.plugin.task.api.TaskExecutionContext;
 import com.boncfc.ide.plugin.task.api.model.JobInstanceExtStatus;
 import com.boncfc.ide.plugin.task.api.model.JobInstanceStatus;
+import com.boncfc.ide.plugin.task.api.utils.ProcessUtils;
 import com.boncfc.ide.server.worker.common.model.Result;
 import com.boncfc.ide.server.worker.config.YarnConfig;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutor;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorHolder;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorThreadPool;
 import com.boncfc.ide.server.worker.utils.LogUtils;
-import com.boncfc.ide.server.worker.utils.OSUtils;
-import com.boncfc.ide.server.worker.utils.ProcessUtils;
+import com.boncfc.ide.plugin.task.api.utils.OSUtils;
 import com.google.common.base.Strings;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.Arrays;
+import java.util.List;
 
 @Slf4j
 @RestController
@@ -75,9 +78,10 @@ public class JobInstanceOperator {
                 workerTaskExecutor.getTaskExecutionContext().getJobInstance().getJiId());
     }
 
-    private void cancelYarnApp(String appId) {
-        if (appId != null && !appId.isEmpty()) {
-            ProcessUtils.stopYarnJob(yarnConfig.getApplicationState(), appId);
+    private void cancelYarnApp(String appIds) {
+        if (appIds != null && !appIds.isEmpty()) {
+            List<String> appList = Arrays.asList(appIds.split(","));
+            appList.forEach(appId -> ProcessUtils.stopYarnJob(yarnConfig.getApplicationState(), appId));
         }
     }
 

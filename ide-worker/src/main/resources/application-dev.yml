@@ -46,7 +46,15 @@ worker:
     # The max waiting time to reconnect to registry if you set the strategy to waiting
     max-waiting-time: 100s
   task-execute-threads-full-policy: REJECT
+  job-timeout: 72000
   datasource-password-aes-key: mySaltValue
+  datax:
+    execute-job-path: /home/datax/jobs
+    python-launcher : /usr/bin/python/bin/python3
+    datax-launcher: /home/datax/bin/datax.py
+    xms: 1
+    xmx: 1
+
 yarn:
   application-state: http://namenode01-sit:8088/ws/v1/cluster/apps/%s/state
 management:

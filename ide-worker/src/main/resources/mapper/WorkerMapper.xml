@@ -236,6 +236,9 @@
             clusters.HADOOP_CONF_DIR,
             clusters.KRB_CONF_PATH,
             clusters.KRB_KEYTABS_DIR,
+            clusters.IS_SECURITY,
+            clusters.PRINCIPAL_NAME,
+            clusters.METASTORE_URL,
             dei.INDEX_NAME,
             pl.PLUGIN_NAME,
             pl.PLUGIN_TYPE
@@ -243,22 +246,24 @@
         left join DRIVER_CONFIGS dc
             on ds.DRIVER_ID = dc.DRIVER_ID
             and ds.DELETED = 'N'
-        left join (select dcr.DS_ID,
+        left join (select
                         ccc.CLUSTER_ID,
                         c.CLUSTER_NAME,
                         c.CLUSTER_TYPE,
                         ccc.DEPENDENCY_JARS_DIR,
                         ccc.HADOOP_CONF_DIR,
                         ccc.KRB_CONF_PATH,
-                        ccc.KRB_KEYTABS_DIR
-                    from DS_CLUSTER_REL dcr
-                    inner join CLUSTERS c
-                        on dcr.CLUSTER_ID = c.CLUSTER_ID
-                        and c.DELETED = 'N'
+                        ccc.KRB_KEYTABS_DIR,
+                        ccc.IS_SECURITY,
+                        ccc.METASTORE_URL,
+                        kpc.PRINCIPAL_NAME
+            from CLUSTERS c
                     inner join CDP_CLUSTER_CONFIGS ccc
-                        on c.CLUSTER_ID = ccc.CLUSTER_ID) clusters
-            on clusters.DS_ID = ds.DS_ID
-            and ds.DS_TYPE in ('HIVE', 'IMPALA')
+                        on c.CLUSTER_ID = ccc.CLUSTER_ID
+                        and c.DELETED = 'N'
+                    left join KRB_PINCIPAL_CONIFGS kpc
+                        on c.CLUSTER_ID = kpc.CLUSTER_ID) clusters
+            on clusters.CLUSTER_ID = ds.CLUSTER_ID
             and ds.DELETED = 'N'
         left join DS_ES_INDEX dei
             on ds.DS_ID = dei.DS_ID

@@ -19,7 +19,10 @@ package com.boncfc.ide.server.worker.runner;
 
 import com.boncfc.ide.plugin.task.api.*;
 import com.boncfc.ide.plugin.task.api.model.*;
+import com.boncfc.ide.plugin.task.api.utils.DateUtils;
 import com.boncfc.ide.plugin.task.api.utils.JSONUtils;
+import com.boncfc.ide.server.worker.utils.LogUtils;
+import com.boncfc.ide.plugin.task.api.utils.ProcessUtils;
 import com.boncfc.ide.server.worker.common.log.TaskInstanceLogHeader;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
 import com.boncfc.ide.server.worker.config.YarnConfig;
@@ -38,7 +41,6 @@ import java.util.stream.Collectors;
 
 import static com.boncfc.ide.plugin.task.api.constants.Constants.*;
 import static com.boncfc.ide.plugin.task.api.model.JobInstanceExtStatus.fail_normal;
-import static com.boncfc.ide.plugin.task.api.model.JobInstanceStatus.fail;
 import static com.boncfc.ide.plugin.task.api.model.JobParamType.IN;
 import static com.boncfc.ide.plugin.task.api.model.JobParamType.OUT;
 import static com.boncfc.ide.plugin.task.api.model.ParamType.RUNTIME;
@@ -131,6 +133,7 @@ public abstract class WorkerTaskExecutor implements Runnable {
             beforeExecute();
             TaskCallBack taskCallBack = TaskCallbackImpl.builder()
                     .taskExecutionContext(taskExecutionContext)
+                    .workerMapper(workerMapper)
                     .build();
             TaskInstanceLogHeader.printExecuteTaskHeader();
             updateJobInstanceStatus(JobInstanceStatus.inp, JobInstanceExtStatus.inp_running);
@@ -228,15 +231,6 @@ public abstract class WorkerTaskExecutor implements Runnable {
                     .jiId(taskExecutionContext.getJobInstance().getJiId())
                     .idType(APPLICATION_ID)
                     .idValue(taskExecutionContext.getAppId())
-                    .build();
-            jobInstanceIdsList.add(jobInstanceIds);
-        }
-
-        if (0 != taskExecutionContext.getProcessId()) {
-            JobInstanceIds jobInstanceIds = JobInstanceIds.builder()
-                    .jiId(taskExecutionContext.getJobInstance().getJiId())
-                    .idType(PID)
-                    .idValue(String.valueOf(taskExecutionContext.getProcessId()))
                     .build();
             jobInstanceIdsList.add(jobInstanceIds);
         }

@@ -5,19 +5,19 @@
     "fieldDelimiter" :"\u0001",
     "connection": {
       "appName": "",
-      "databaseName": "",
+      "databaseName": "datax",
       "querySql": "",
       "jdbcUrl": "",
       "username": "",
       "password": ""
     },
     "defaultFS": "",
-    "clusterConfigPath": "",
+    "hadoopConfigPath": "",
     "encoding": "UTF-8",
     "nullFormat": "\\N",
     "havekerberos": true,
-    "krbconfFilePath": "",
-    "kerberosKeytabFilePath": "",
-    "kerberosPrincipal": ""
+    "krbConfPath": "",
+    "krbKeytabPath": "",
+    "krbPrincipal": ""
   }
 }

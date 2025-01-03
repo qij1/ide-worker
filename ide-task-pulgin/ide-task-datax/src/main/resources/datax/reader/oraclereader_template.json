@@ -1,23 +1,7 @@
 {
   "name": "oraclereader",
   "parameter": {
-    "username": "",
-    "password": "",
-    "column": [
-      "*"
-    ],
-    "preSql": [
-
-    ],
     "connection": [
-      {
-        "querySql": [
-          ""
-        ],
-        "jdbcUrl": [
-          "jdbc:mysql://bad_ip:3306/database"
-        ]
-      }
     ]
   }
 }

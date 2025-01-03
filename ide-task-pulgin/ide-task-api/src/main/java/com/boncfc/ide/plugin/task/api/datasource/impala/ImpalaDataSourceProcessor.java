@@ -20,6 +20,7 @@ package com.boncfc.ide.plugin.task.api.datasource.impala;
 import com.boncfc.ide.plugin.task.api.TaskException;
 import com.boncfc.ide.plugin.task.api.constants.DataSourceConstants;
 import com.boncfc.ide.plugin.task.api.datasource.*;
+import com.boncfc.ide.plugin.task.api.datasource.hive.HiveImpalaConnectionParam;
 import com.boncfc.ide.plugin.task.api.datasource.mysql.MySQLConnectionParam;
 import com.boncfc.ide.plugin.task.api.datasource.oracle.OracleConnectionParam;
 import com.boncfc.ide.plugin.task.api.model.DatasourceDetailInfo;
@@ -58,13 +59,13 @@ public class ImpalaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public ConnectionParam createConnectionParams(DatasourceDetailInfo detailInfo) {
-        ImpalaConnectionParam impalaConnectionParam = JSONUtils.parseObject(detailInfo.getDsConf(), ImpalaConnectionParam.class);
-        impalaConnectionParam.setDriverClassName(detailInfo.getClassName());
-        impalaConnectionParam.setDriverLocation(detailInfo.getJarDir() + File.separator + detailInfo.getJarFileName());
-        impalaConnectionParam.setPassword(AESUtil.decrypt(impalaConnectionParam.getPassword(),
+        HiveImpalaConnectionParam HiveImpalaConnectionParam = JSONUtils.parseObject(detailInfo.getDsConf(), HiveImpalaConnectionParam.class);
+        HiveImpalaConnectionParam.setDriverClassName(detailInfo.getClassName());
+        HiveImpalaConnectionParam.setDriverLocation(detailInfo.getJarDir() + File.separator + detailInfo.getJarFileName());
+        HiveImpalaConnectionParam.setPassword(AESUtil.decrypt(HiveImpalaConnectionParam.getPassword(),
                 detailInfo.getDsPasswordAESKey().getBytes(StandardCharsets.UTF_8)));
-        checkDatasourceParam(impalaConnectionParam);
-        return impalaConnectionParam;
+        checkDatasourceParam(HiveImpalaConnectionParam);
+        return HiveImpalaConnectionParam;
     }
 
     @Override
@@ -80,18 +81,18 @@ public class ImpalaDataSourceProcessor extends AbstractDataSourceProcessor {
 
     @Override
     public String getJdbcUrl(ConnectionParam connectionParam) {
-        ImpalaConnectionParam impalaConnectionParam = (ImpalaConnectionParam) connectionParam;
-        return impalaConnectionParam.getJdbcUrl();
+        HiveImpalaConnectionParam HiveImpalaConnectionParam = (HiveImpalaConnectionParam) connectionParam;
+        return HiveImpalaConnectionParam.getJdbcUrl();
     }
 
     @Override
     public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException {
-        ImpalaConnectionParam impalaConnectionParam = (ImpalaConnectionParam) connectionParam;
+        HiveImpalaConnectionParam HiveImpalaConnectionParam = (HiveImpalaConnectionParam) connectionParam;
         Driver driver;
         try {
-            URL[] urls = new URL[]{new URL("file:" + impalaConnectionParam.getDriverLocation())};
+            URL[] urls = new URL[]{new URL("file:" + HiveImpalaConnectionParam.getDriverLocation())};
             URLClassLoader classLoader = new URLClassLoader(urls);
-            Class<?> driverClass = classLoader.loadClass(impalaConnectionParam.getDriverClassName());
+            Class<?> driverClass = classLoader.loadClass(HiveImpalaConnectionParam.getDriverClassName());
             driver = (Driver) driverClass.getDeclaredConstructor().newInstance();
         } catch (MalformedURLException | InvocationTargetException |
                  InstantiationException | IllegalAccessException |
@@ -99,13 +100,13 @@ public class ImpalaDataSourceProcessor extends AbstractDataSourceProcessor {
             log.error("获取Oracle数据库连接失败", e);
             throw new TaskException("获取连接失败: " + e.getMessage());
         }
-        String user = impalaConnectionParam.getUserName();
-        String password = impalaConnectionParam.getPassword();
-        Properties connectionProperties = getConnectionProperties(impalaConnectionParam, user, password);
-        return driver.connect(impalaConnectionParam.getJdbcUrl(), connectionProperties);
+        String user = HiveImpalaConnectionParam.getUserName();
+        String password = HiveImpalaConnectionParam.getPassword();
+        Properties connectionProperties = getConnectionProperties(HiveImpalaConnectionParam, user, password);
+        return driver.connect(HiveImpalaConnectionParam.getJdbcUrl(), connectionProperties);
     }
 
-    private Properties getConnectionProperties(ImpalaConnectionParam oracleConnectionParam, String user,
+    private Properties getConnectionProperties(HiveImpalaConnectionParam oracleConnectionParam, String user,
                                                String password) {
         Properties connectionProperties = new Properties();
         connectionProperties.put("user", user);

@@ -1,0 +1,12 @@
+{
+  "name": "hbase20xsqlreader",
+  "parameter": {
+    "jdbcUrl": "",
+    "serialization": "PROTOBUF",
+    "querySql": [],
+    "havekerberos": true,
+    "krbConfPath": "",
+    "krbKeytabPath": "",
+    "krbPrincipal": ""
+  }
+}

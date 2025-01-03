@@ -17,7 +17,7 @@
 
 package com.boncfc.ide.server.worker.utils;
 
-import com.boncfc.ide.server.worker.thread.DefaultUncaughtExceptionHandler;
+import com.boncfc.ide.plugin.task.api.thread.DefaultUncaughtExceptionHandler;
 import com.google.common.util.concurrent.ThreadFactoryBuilder;
 import lombok.experimental.UtilityClass;
 import lombok.extern.slf4j.Slf4j;

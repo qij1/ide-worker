@@ -19,11 +19,6 @@ public final class Constants {
 
     public static final String REMOTE_LOGGING_YAML_PATH = "/remote-logging.yaml";
 
-    /**
-     * sudo enable
-     */
-    public static final String SUDO_ENABLE = "sudo.enable";
-
 
     public static final String WORKFLOW_INSTANCE_ID_MDC_KEY = "workflowInstanceId";
 

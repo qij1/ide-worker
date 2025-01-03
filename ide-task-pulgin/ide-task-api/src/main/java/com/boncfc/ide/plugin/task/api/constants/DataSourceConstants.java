@@ -131,4 +131,6 @@ public class DataSourceConstants {
 
     public static final int TIMEOUT_SECONDS = 1800;
 
+    public static final String DATAX_TARGET_TABLE_TEMP_HDFS_PATH = "/user/datax/transfer/";
+
 }

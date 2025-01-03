@@ -20,6 +20,11 @@ public class DataxJobConf implements JobConf {
         int dsId;
         String querySql;
         String dsType;
+        String filePath;
+        String fileName;
+        String colSplit;
+        String fileType;
+        boolean skipHeader;
     }
 
     @Data
@@ -30,5 +35,18 @@ public class DataxJobConf implements JobConf {
         String preSql;
         String postSql;
         String batchSize;
+        String hivePartition;
+        String fileName;
+        String setSql; //hive
+        String filePath;
+        String colSplit;  // ftp hdfs
+        boolean notAllowControlCharacter;  // ftp
+        String path;  // ftp
+        String split;  // ftp
+        String hbaseColumns;
+
+        String writeMode; // hdfs
+        String fileType; // hdfs
+        String compress; // hdfs
     }
 }

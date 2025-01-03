@@ -19,9 +19,11 @@ package com.boncfc.ide.server.worker.common.model;
 
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
+import com.boncfc.ide.plugin.task.api.model.BaseHeartBeat;
+
 
 @SuperBuilder
 @NoArgsConstructor
-public class MasterHeartBeat extends BaseHeartBeat implements HeartBeat {
+public class MasterHeartBeat extends BaseHeartBeat {
 
 }

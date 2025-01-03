@@ -17,6 +17,7 @@
 
 package com.boncfc.ide.plugin.task.api;
 
+import com.boncfc.ide.plugin.task.api.constants.Constants;
 import com.boncfc.ide.plugin.task.api.model.JobInstanceParams;
 import com.boncfc.ide.plugin.task.api.model.TaskExecutionStatus;
 import lombok.Getter;
@@ -30,6 +31,8 @@ import java.util.StringJoiner;
 import java.util.concurrent.LinkedBlockingQueue;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
+import static com.boncfc.ide.plugin.task.api.constants.Constants.APPLICATION_REGEX;
 
 @Slf4j
 public abstract class AbstractTask {
@@ -141,13 +144,9 @@ public abstract class AbstractTask {
      *
      * @param logs log list
      */
-    public void logHandle(LinkedBlockingQueue<String> logs) {
-
-        StringJoiner joiner = new StringJoiner("\n\t");
-        while (!logs.isEmpty()) {
-            joiner.add(logs.poll());
-        }
-        log.info(" -> {}", joiner);
+    public void logHandle(String logs) {
+        findAppId(logs);
+        log.info(logs);
     }
 
     public static String groupName = "paramName1";
@@ -171,9 +170,7 @@ public abstract class AbstractTask {
         int index = 1;
         while (m.find()) {
             String paramName = m.group(groupName);
-            System.out.println(paramName);
             JobInstanceParams prop = paramsPropsMap.get(paramName);
-
             if (prop == null) {
                 log.error(
                         "setSqlParamsMap: No Property with paramName: {} is found in paramsPropsMap of task instance"
@@ -188,74 +185,6 @@ public abstract class AbstractTask {
             }
         }
     }
-
-//    public static void main(String[] args) {
-//        String sql = "select * from aaaa where ymd = ${ymd} and yest=${yest} and aa = ${aaa}";
-//        JobInstanceParams jobInstanceParams = JobInstanceParams.builder().
-//                jobParamType("string").paramName("ymd").paramValue("20241203").dataType("string").
-//                build();
-//        JobInstanceParams jobInstanceParams2 = JobInstanceParams.builder().
-//                jobParamType("string").paramName("yest").paramValue("20241202").dataType("string").
-//                build();
-//        JobInstanceParams jobInstanceParams3 = JobInstanceParams.builder().
-//                jobParamType("string").paramName("aaa").paramValue("11.1").dataType("number").
-//                build();
-//        Map<String, JobInstanceParams> paramsPropsMap = new HashMap<>();
-//        paramsPropsMap.put("ymd", jobInstanceParams);
-//        paramsPropsMap.put("yest", jobInstanceParams2);
-//        paramsPropsMap.put("aaa", jobInstanceParams3);
-//        StringBuilder sqlBuilder = new StringBuilder();
-//        if (paramsPropsMap == null) {
-//            sqlBuilder.append(sql);
-//            System.out.println(sqlBuilder.toString());
-//        }
-//        Map<Integer, JobInstanceParams> sqlParamsMap = new HashMap<>();
-//
-//        setSqlParamsMap(sql, rgex, sqlParamsMap, paramsPropsMap, 1);
-//        String formatSql = sql.replaceAll(rgex, "?");
-//        System.out.println(sqlBuilder);
-//    }
-
-
-//    public static void main(String[] args) {
-//        System.out.println(Double.parseDouble("1"));
-//        String sql = "/**asdsass" +
-//                "sddasdsd" +
-//                "adssdsw*/\n" +
-//                "    select * from aaaa where ymd = ${ymd} and yest=${yest} and aa = ${aaa};" +
-//                "insert into ccc select * from bbb";
-//        JobInstanceParams jobInstanceParams = JobInstanceParams.builder().
-//                jobParamType("string").paramName("ymd").paramValue("20241203").dataType("string").sortIndex(1).
-//                build();
-//        JobInstanceParams jobInstanceParams2 = JobInstanceParams.builder().
-//                jobParamType("string").paramName("yest").paramValue("20241202").dataType("string").sortIndex(2).
-//                build();
-//        JobInstanceParams jobInstanceParams3 = JobInstanceParams.builder().
-//                jobParamType("string").paramName("aaa").paramValue("11.1").dataType("number").sortIndex(3).
-//                build();
-//        List<JobInstanceParams> jobInstanceParamsList = new LinkedList<>();
-//        jobInstanceParamsList.add(jobInstanceParams2);
-//        jobInstanceParamsList.add(jobInstanceParams);
-//        jobInstanceParamsList.add(jobInstanceParams3);
-//        List<JobInstanceParams> jobInstanceParams11 = jobInstanceParamsList.stream()
-//                .sorted(Comparator.comparing(JobInstanceParams::getSortIndex))
-//                .collect(Collectors.toList());
-//
-//        jobInstanceParams11.get(0).setParamValue("2222222222");
-//        jobInstanceParams11.get(1).setParamValue("3333333333");
-//        jobInstanceParams11.get(2).setParamValue("4444444444");
-//
-//        Map<String, JobInstanceParams> paramsPropsMap = new HashMap<>();
-//        paramsPropsMap.put("ymd", jobInstanceParams);
-//        paramsPropsMap.put("yest", jobInstanceParams2);
-//        paramsPropsMap.put("aaa", jobInstanceParams3);
-//        List<String> subSqls = new MySQLDataSourceProcessor().splitAndRemoveComment(sql);
-//        for (String subSql : subSqls) {
-//            System.out.println(subSql);
-////            getSqlAndSqlParamsMap(subSql);
-//        }
-//
-//    }
 
     private static final char PARAM_REPLACE_CHAR = '?';
 
@@ -284,5 +213,21 @@ public abstract class AbstractTask {
         params.clear();
         params.putAll(expandMap);
         return ret.toString();
+    }
+
+
+    private static final Pattern APPLICATION_REGEX = Pattern.compile(Constants.APPLICATION_REGEX);
+
+    /**
+     * 匹配applicationId
+     *
+     * @return appid
+     */
+    protected void findAppId(String line) {
+        // 通过正则表达式找到yarn上job的appId
+        Matcher matcher = APPLICATION_REGEX.matcher(line);
+        if (matcher.find()) {
+            taskRequest.setAppId(taskRequest.getAppId().isEmpty() ? matcher.group() : taskRequest.getAppId() + "," +matcher.group());
+        }
     }
 }

@@ -2,12 +2,11 @@ package com.boncfc.ide.server.worker;
 
 import com.boncfc.ide.plugin.task.api.TaskPluginManager;
 import com.boncfc.ide.plugin.task.api.datasource.DataSourceProcessorProvider;
+import com.boncfc.ide.plugin.task.api.lifecycle.ServerLifeCycleManager;
 import com.boncfc.ide.server.worker.common.IStoppable;
-import com.boncfc.ide.server.worker.common.lifecycle.ServerLifeCycleManager;
 import com.boncfc.ide.server.worker.constants.Constants;
 import com.boncfc.ide.server.worker.registry.RegistryClient;
 import com.boncfc.ide.server.worker.registry.WorkerRegistryClient;
-import com.boncfc.ide.server.worker.thread.TaskThread;
 import com.boncfc.ide.server.worker.utils.ThreadUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.mybatis.spring.annotation.MapperScan;

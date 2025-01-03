@@ -22,9 +22,12 @@ public class DatasourceDetailInfo {
     String jarFileName;
     String clusterName;
     String dependencyJarsDir;
+    String isSecurity;
     String hadoopConfDir;
+    String metastoreUrl;
     String krbConfPath;
     String krbKeytabsDir;
+    String principalName;
     String indexName;
     String dsPasswordAESKey;
     String pluginName;

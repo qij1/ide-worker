@@ -18,7 +18,7 @@
 package com.boncfc.ide.server.worker.metrics;
 
 import com.boncfc.ide.server.worker.config.SystemMetrics;
-import com.boncfc.ide.server.worker.utils.OSUtils;
+import com.boncfc.ide.plugin.task.api.utils.OSUtils;
 import io.micrometer.core.instrument.MeterRegistry;
 
 public class DefaultMetricsProvider implements MetricsProvider {

@@ -106,7 +106,7 @@ public class SqlTask extends AbstractTask {
                 }
                 Thread.sleep(300);
             }
-
+            taskExecutionContext.setTaskAppId(taskRequest.getTaskAppId());
             setExitStatusCode(TaskConstants.EXIT_CODE_SUCCESS);
         } catch (Exception e) {
             setExitStatusCode(TaskConstants.EXIT_CODE_FAILURE);
@@ -324,13 +324,13 @@ public class SqlTask extends AbstractTask {
          *
          * @return appid
          */
-        private void findAppId(String line) {
-            // 通过正则表达式找到yarn上job的appId
-            Matcher matcher = APPLICATION_REGEX.matcher(line);
-            if (matcher.find()) {
-                taskExecutionContext.setAppId(matcher.group());
-            }
-        }
+//        private void findAppId(String line) {
+//            // 通过正则表达式找到yarn上job的appId
+//            Matcher matcher = APPLICATION_REGEX.matcher(line);
+//            if (matcher.find()) {
+//                taskExecutionContext.setAppId(matcher.group());
+//            }
+//        }
     }
 
 

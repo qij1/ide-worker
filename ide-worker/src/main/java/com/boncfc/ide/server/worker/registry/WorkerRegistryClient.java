@@ -18,6 +18,7 @@
 package com.boncfc.ide.server.worker.registry;
 
 import com.boncfc.ide.plugin.task.api.TaskConstants;
+import com.boncfc.ide.plugin.task.api.constants.ServerStatus;
 import com.boncfc.ide.plugin.task.api.utils.JSONUtils;
 import com.boncfc.ide.server.worker.common.IStoppable;
 import com.boncfc.ide.server.worker.common.Server;
@@ -27,7 +28,6 @@ import com.boncfc.ide.server.worker.constants.Constants;
 import com.boncfc.ide.server.worker.registry.enums.RegistryNodeType;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorThreadPool;
 import com.boncfc.ide.server.worker.utils.ThreadUtils;
-import com.boncfc.ide.server.worker.common.ServerStatus;
 import com.boncfc.ide.server.worker.metrics.MetricsProvider;
 import com.boncfc.ide.server.worker.task.WorkerHeartBeatTask;
 import com.boncfc.ide.server.worker.utils.Host;

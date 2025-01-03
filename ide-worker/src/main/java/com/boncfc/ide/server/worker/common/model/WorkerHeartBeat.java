@@ -17,6 +17,7 @@
 
 package com.boncfc.ide.server.worker.common.model;
 
+import com.boncfc.ide.plugin.task.api.model.BaseHeartBeat;
 import lombok.Data;
 import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
@@ -26,7 +27,7 @@ import lombok.experimental.SuperBuilder;
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
 @NoArgsConstructor
-public class WorkerHeartBeat extends BaseHeartBeat implements HeartBeat {
+public class WorkerHeartBeat extends BaseHeartBeat {
 
     private int workerHostWeight; // worker host weight
     private int threadPoolUsage; // worker waiting task count

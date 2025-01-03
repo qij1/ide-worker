@@ -17,9 +17,9 @@
 
 package com.boncfc.ide.server.worker.registry;
 
-import com.boncfc.ide.server.worker.common.lifecycle.ServerLifeCycleException;
+import com.boncfc.ide.plugin.task.api.lifecycle.ServerLifeCycleException;
+import com.boncfc.ide.plugin.task.api.lifecycle.ServerLifeCycleManager;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorThreadPool;
-import com.boncfc.ide.server.worker.common.lifecycle.ServerLifeCycleManager;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
 import com.boncfc.ide.server.worker.runner.WorkerTaskExecutorHolder;
 import lombok.NonNull;

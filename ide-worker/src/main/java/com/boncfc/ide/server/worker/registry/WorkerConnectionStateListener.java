@@ -17,8 +17,8 @@
 
 package com.boncfc.ide.server.worker.registry;
 
+import com.boncfc.ide.plugin.task.api.lifecycle.ServerLifeCycleManager;
 import com.boncfc.ide.server.worker.registry.enums.ConnectionState;
-import com.boncfc.ide.server.worker.common.lifecycle.ServerLifeCycleManager;
 import com.boncfc.ide.server.worker.config.WorkerConfig;
 import lombok.NonNull;
 import lombok.extern.slf4j.Slf4j;

@@ -17,9 +17,10 @@
 
 package com.boncfc.ide.server.worker.config;
 
+import com.boncfc.ide.plugin.task.api.model.DataxProperties;
 import com.boncfc.ide.server.worker.registry.ConnectStrategyProperties;
 import com.boncfc.ide.server.worker.registry.enums.RegistryNodeType;
-import com.boncfc.ide.server.worker.utils.NetUtils;
+import com.boncfc.ide.plugin.task.api.utils.NetUtils;
 import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.lang3.StringUtils;
@@ -43,9 +44,11 @@ public class WorkerConfig implements Validator {
     private int batchJobNum = 3;
     private Duration maxHeartbeatInterval = Duration.ofSeconds(10);
     private int hostWeight = 100;
+    private int jobTimeout = 18000;
     private WorkerServerLoadProtection serverLoadProtection = new WorkerServerLoadProtection();
     private ConnectStrategyProperties registryDisconnectStrategy = new ConnectStrategyProperties();
-
+    private DataxProperties datax = new DataxProperties();
+    private String datasourcePasswordAesKey;
     /**
      * This field doesn't need to set at config file, it will be calculated by workerIp:listenPort
      */
@@ -53,7 +56,7 @@ public class WorkerConfig implements Validator {
     private String workerHost;
     private String workerRegistryPath;
     private TaskExecuteThreadsFullPolicy taskExecuteThreadsFullPolicy = TaskExecuteThreadsFullPolicy.REJECT;
-    private String datasourcePasswordAesKey;
+
 
     @Override
     public boolean supports(Class<?> clazz) {

@@ -20,18 +20,30 @@ package com.boncfc.ide.server.worker.runner;
 import com.boncfc.ide.plugin.task.api.TaskCallBack;
 import com.boncfc.ide.plugin.task.api.TaskExecutionContext;
 import com.boncfc.ide.plugin.task.api.model.ApplicationInfo;
+import com.boncfc.ide.plugin.task.api.model.JobInstance;
+import com.boncfc.ide.plugin.task.api.model.JobInstanceIds;
+import com.boncfc.ide.server.worker.mapper.WorkerMapper;
 import lombok.Builder;
 import lombok.extern.slf4j.Slf4j;
+
+import java.util.LinkedList;
+import java.util.List;
+
+import static com.boncfc.ide.plugin.task.api.constants.Constants.APPLICATION_ID;
+import static com.boncfc.ide.plugin.task.api.constants.Constants.PID;
 
 @Slf4j
 @Builder
 public class TaskCallbackImpl implements TaskCallBack {
 
-
     private final TaskExecutionContext taskExecutionContext;
 
-    public TaskCallbackImpl(TaskExecutionContext taskExecutionContext) {
+    private final WorkerMapper workerMapper;
+
+
+    public TaskCallbackImpl(TaskExecutionContext taskExecutionContext, WorkerMapper workerMapper) {
         this.taskExecutionContext = taskExecutionContext;
+        this.workerMapper = workerMapper;
     }
 
     @Override
@@ -41,6 +53,17 @@ public class TaskCallbackImpl implements TaskCallBack {
 
     @Override
     public void updateTaskInstanceInfo(int taskInstanceId) {
+        List<JobInstanceIds> jobInstanceIdsList = new LinkedList<>();
+        if (0 != taskExecutionContext.getProcessId()) {
+            JobInstanceIds jobInstanceIds = JobInstanceIds.builder()
+                    .jiId(taskExecutionContext.getJobInstance().getJiId())
+                    .idType(PID)
+                    .idValue(String.valueOf(taskExecutionContext.getProcessId()))
+                    .build();
+            jobInstanceIdsList.add(jobInstanceIds);
+        }
+
+        if (!jobInstanceIdsList.isEmpty()) workerMapper.addJobInstanceIds(jobInstanceIdsList);
     }
 
 }

@@ -9,11 +9,11 @@
     "writeMode": "",
     "fieldDelimiter": "",
     "compress":"",
-    "clusterConfigPath": "",
+    "hadoopConfigPath": "",
     "encoding": "UTF-8",
     "havekerberos": true,
-    "krbconfFilePath": "",
-    "kerberosPrincipal": "",
-    "kerberosKeytabFilePath": ""
+    "krbConfPath": "",
+    "krbKeytabPath": "",
+    "krbPrincipal": ""
   }
 }

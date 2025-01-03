@@ -25,7 +25,9 @@ import lombok.extern.slf4j.Slf4j;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
 
+import java.io.IOException;
 import java.sql.Connection;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.Collections;
 import java.util.List;
@@ -116,5 +118,30 @@ public abstract class AbstractDataSourceProcessor implements DataSourceProcessor
             log.error("Check datasource connectivity for: {} error", getDbType().name(), e);
             return false;
         }
+    }
+
+    @Override
+    public String getValidationQuery() {
+        return "";
+    }
+
+    @Override
+    public String getJdbcUrl(ConnectionParam connectionParam) {
+        return "";
+    }
+
+    @Override
+    public Connection getConnection(ConnectionParam connectionParam) throws ClassNotFoundException, SQLException, IOException {
+        return null;
+    }
+
+    @Override
+    public List<String> splitAndRemoveComment(String sql) {
+        return null;
+    }
+
+    @Override
+    public String getDatasourceDriver() {
+        return null;
     }
 }

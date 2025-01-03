@@ -5,7 +5,7 @@
     "fileType": "text",
     "writeMode": "append",
     "column":["*"],
-    "databaseName":"",
+    "databaseName":"datax",
     "path": "",
     "connection": {
       "databaseName": "",
@@ -18,13 +18,11 @@
       "setSql": ""
     },
     "defaultFS": "",
-    "clusterConfigPath":"",
-    "haveKerberos": true,
-    "krbConfFilePath": "",
-    "kerberosPrincipal": "",
-    "kerberosKeytabFilePath": "",
-    "kerberosHivePrincipal": "",
-    "kerberosHiveKeytabFilePath": "",
+    "hadoopConfigPath":"",
+    "havekerberos": true,
+    "krbConfPath": "",
+    "krbKeytabPath": "",
+    "krbPrincipal": "",
     "metastore": "",
     "encoding": "UTF-8"
   }

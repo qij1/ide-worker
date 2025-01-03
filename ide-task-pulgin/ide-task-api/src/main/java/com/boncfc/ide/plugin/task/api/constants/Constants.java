@@ -29,4 +29,18 @@ public class Constants {
     public static final String APPLICATION_ID = "APPLICATION_ID";
 
     public static final String PID = "PID";
+
+    /**
+     * common properties path
+     */
+    public static final String COMMON_PROPERTIES_PATH = "/common.properties";
+
+    public static final String REMOTE_LOGGING_YAML_PATH = "/remote-logging.yaml";
+
+    public static final String TASK_RESOURCE_LIMIT_STATE = "task.resource.limit.state";
+    public static final String SUDO_ENABLE = "sudo.enable";
+
+    public static final String EMPTY_STRING = "";
+
+
 }

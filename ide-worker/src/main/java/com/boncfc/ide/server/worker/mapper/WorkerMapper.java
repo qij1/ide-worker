@@ -8,6 +8,7 @@ import org.apache.ibatis.annotations.Param;
 import java.util.List;
 import java.util.Map;
 import java.util.Objects;
+import java.util.Set;
 
 @Mapper
 public interface WorkerMapper {
@@ -36,7 +37,7 @@ public interface WorkerMapper {
 
     int addJobInstanceIds(@Param("jobInstanceIdsList") List<JobInstanceIds> jobInstanceIdsList);
 
-    List<DatasourceDetailInfo> getDatasourceDetailInfoList(@Param("dsIds") List<Integer> dsIds, @Param("pluginType") String pluginType);
+    List<DatasourceDetailInfo> getDatasourceDetailInfoList(@Param("dsIds") Set<Integer> dsIds, @Param("pluginType") String pluginType);
 
 
 }

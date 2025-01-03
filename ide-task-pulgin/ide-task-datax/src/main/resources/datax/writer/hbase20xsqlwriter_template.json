@@ -1,0 +1,15 @@
+{
+  "name": "hbase20xsqlwriter",
+  "parameter": {
+    "batchSize": 100,
+    "column": [
+    ],
+    "jdbcUrl": "",
+    "nullMode": "skip",
+    "table": "目标hbase表名，大小写有关",
+    "havekerberos": true,
+    "krbConfPath": "",
+    "krbKeytabPath": "",
+    "krbPrincipal": ""
+  }
+}
